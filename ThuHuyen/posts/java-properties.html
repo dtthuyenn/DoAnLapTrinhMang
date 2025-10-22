@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Properties trong Java - DevBlog</title>
+    <meta name="description" content="Hướng dẫn chi tiết về properties trong Java: getter, setter, access modifiers và best practices.">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DevBlog</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../blog.html" class="nav-link">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Article Content -->
+    <article class="article">
+        <a href="../blog.html" class="back-btn">← Quay lại Blog</a>
+        
+        <header class="article-header">
+            <h1 class="article-title">Properties trong Java</h1>
+            <div class="article-meta">
+                <span class="blog-category">Java</span> • 
+                Đăng ngày 29/09/2024 • 
+                6 phút đọc
+            </div>
+        </header>
+
+        <div class="article-content">
+            <h2>📖 Properties là gì?</h2>
+            <p>
+                Properties (thuộc tính) trong Java là các fields của một class được truy cập thông qua 
+                getter và setter methods. Đây là cách thực hiện nguyên lý Encapsulation trong OOP.
+            </p>
+
+            <h2>🏗️ Cấu trúc cơ bản của Properties</h2>
+            <div class="code-block">
+                <code>public class Person {
+    // Private fields (backing fields)
+    private String name;
+    private int age;
+    private String email;
+    
+    // Constructor
+    public Person(String name, int age, String email) {
+        this.name = name;
+        this.age = age;
+        this.email = email;
+    }
+    
+    // Getter methods
+    public String getName() {
+        return name;
+    }
+    
+    public int getAge() {
+        return age;
+    }
+    
+    public String getEmail() {
+        return email;
+    }
+    
+    // Setter methods
+    public void setName(String name) {
+        if (name != null && !name.trim().isEmpty()) {
+            this.name = name;
+        }
+    }
+    
+    public void setAge(int age) {
+        if (age >= 0 && age <= 150) {
+            this.age = age;
+        }
+    }
+    
+    public void setEmail(String email) {
+        if (email != null && email.contains("@")) {
+            this.email = email;
+        }
+    }
+}</code>
+            </div>
+
+            <h2>🔒 Access Modifiers</h2>
+            <div class="code-block">
+                <code>public class AccessExample {
+    public String publicField;        // Truy cập từ mọi nơi
+    protected String protectedField;  // Truy cập trong package và subclass
+    String packageField;              // Chỉ trong package (default)
+    private String privateField;      // Chỉ trong class này
+    
+    // Public getter/setter cho private field
+    public String getPrivateField() {
+        return privateField;
+    }
+    
+    public void setPrivateField(String value) {
+        // Có thể thêm validation logic
+        if (value != null) {
+            this.privateField = value;
+        }
+    }
+}</code>
+            </div>
+
+            <h2>✅ Validation trong Setters</h2>
+            <div class="code-block">
+                <code>public class BankAccount {
+    private String accountNumber;
+    private double balance;
+    private String ownerName;
+    
+    public void setAccountNumber(String accountNumber) {
+        if (accountNumber == null || accountNumber.length() != 10) {
+            throw new IllegalArgumentException("Account number must be 10 digits");
+        }
+        if (!accountNumber.matches("\\d{10}")) {
+            throw new IllegalArgumentException("Account number must contain only digits");
+        }
+        this.accountNumber = accountNumber;
+    }
+    
+    public void setBalance(double balance) {
+        if (balance < 0) {
+            throw new IllegalArgumentException("Balance cannot be negative");
+        }
+        this.balance = balance;
+    }
+    
+    public void setOwnerName(String ownerName) {
+        if (ownerName == null || ownerName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Owner name cannot be empty");
+        }
+        if (ownerName.length() > 50) {
+            throw new IllegalArgumentException("Owner name too long");
+        }
+        this.ownerName = ownerName.trim();
+    }
+}</code>
+            </div>
+
+            <h2>🎯 Boolean Properties</h2>
+            <div class="code-block">
+                <code>public class User {
+    private boolean active;
+    private boolean admin;
+    private boolean verified;
+    
+    // Boolean getters có thể sử dụng 'is' prefix
+    public boolean isActive() {
+        return active;
+    }
+    
+    public boolean isAdmin() {
+        return admin;
+    }
+    
+    public boolean isVerified() {
+        return verified;
+    }
+    
+    // Setters như bình thường
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+    
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+    
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
+    
+    // Convenience methods
+    public void activate() {
+        this.active = true;
+    }
+    
+    public void deactivate() {
+        this.active = false;
+    }
+}</code>
+            </div>
+
+            <h2>🔄 Computed Properties</h2>
+            <div class="code-block">
+                <code>public class Rectangle {
+    private double width;
+    private double height;
+    
+    // Constructors, getters, setters...
+    
+    // Computed property - không có backing field
+    public double getArea() {
+        return width * height;
+    }
+    
+    public double getPerimeter() {
+        return 2 * (width + height);
+    }
+    
+    // Read-only computed property
+    public String getDimensions() {
+        return width + " x " + height;
+    }
+    
+    // Boolean computed property
+    public boolean isSquare() {
+        return width == height;
+    }
+}
+
+public class Person {
+    private String firstName;
+    private String lastName;
+    private Date birthDate;
+    
+    // Computed full name
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+    
+    // Computed age
+    public int getAge() {
+        Calendar today = Calendar.getInstance();
+        Calendar birth = Calendar.getInstance();
+        birth.setTime(birthDate);
+        
+        int age = today.get(Calendar.YEAR) - birth.get(Calendar.YEAR);
+        if (today.get(Calendar.DAY_OF_YEAR) < birth.get(Calendar.DAY_OF_YEAR)) {
+            age--;
+        }
+        return age;
+    }
+}</code>
+            </div>
+
+            <h2>🚀 Advanced Property Patterns</h2>
+
+            <h3>1. Lazy Loading Properties</h3>
+            <div class="code-block">
+                <code>public class DataProcessor {
+    private List<String> data;
+    private String processedResult; // Cached result
+    
+    public String getProcessedResult() {
+        if (processedResult == null) {
+            // Expensive computation
+            processedResult = processData();
+        }
+        return processedResult;
+    }
+    
+    private String processData() {
+        // Simulate expensive operation
+        return data.stream()
+                  .map(String::toUpperCase)
+                  .collect(Collectors.joining(", "));
+    }
+    
+    public void setData(List<String> data) {
+        this.data = data;
+        this.processedResult = null; // Invalidate cache
+    }
+}</code>
+            </div>
+
+            <h3>2. Property Change Notification</h3>
+            <div class="code-block">
+                <code>import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
+public class ObservableModel {
+    private PropertyChangeSupport support;
+    private String name;
+    private int value;
+    
+    public ObservableModel() {
+        support = new PropertyChangeSupport(this);
+    }
+    
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        support.addPropertyChangeListener(listener);
+    }
+    
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        support.removePropertyChangeListener(listener);
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public void setName(String name) {
+        String oldName = this.name;
+        this.name = name;
+        support.firePropertyChange("name", oldName, name);
+    }
+    
+    public int getValue() {
+        return value;
+    }
+    
+    public void setValue(int value) {
+        int oldValue = this.value;
+        this.value = value;
+        support.firePropertyChange("value", oldValue, value);
+    }
+}</code>
+            </div>
+
+            <h2>📋 Property Conventions</h2>
+            <ul>
+                <li><strong>Naming:</strong> camelCase cho property names</li>
+                <li><strong>Getters:</strong> <span class="inline-code">getPropertyName()</span> hoặc <span class="inline-code">isPropertyName()</span> cho boolean</li>
+                <li><strong>Setters:</strong> <span class="inline-code">setPropertyName(type value)</span></li>
+                <li><strong>Private fields:</strong> Luôn private trừ khi có lý do đặc biệt</li>
+            </ul>
+
+            <h2>🎨 Best Practices</h2>
+            <div class="code-block">
+                <code>public class BestPracticeExample {
+    private static final int MAX_NAME_LENGTH = 100;
+    private String name;
+    private final List<String> tags = new ArrayList<>();
+    
+    // 1. Validate input
+    public void setName(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+        if (name.length() > MAX_NAME_LENGTH) {
+            throw new IllegalArgumentException("Name too long");
+        }
+        this.name = name.trim();
+    }
+    
+    // 2. Return defensive copies for mutable objects
+    public List<String> getTags() {
+        return new ArrayList<>(tags);
+    }
+    
+    // 3. Provide methods to modify collections safely
+    public void addTag(String tag) {
+        if (tag != null && !tag.trim().isEmpty()) {
+            tags.add(tag.trim());
+        }
+    }
+    
+    public void removeTag(String tag) {
+        tags.remove(tag);
+    }
+    
+    public void clearTags() {
+        tags.clear();
+    }
+}</code>
+            </div>
+
+            <h2>⚡ Performance Considerations</h2>
+            <ul>
+                <li><strong>Lazy initialization:</strong> Cho expensive computations</li>
+                <li><strong>Caching:</strong> Cache computed values khi cần</li>
+                <li><strong>Validation cost:</strong> Cân nhắc cost của validation logic</li>
+                <li><strong>Memory leaks:</strong> Cẩn thận với listeners và callbacks</li>
+            </ul>
+
+            <h2>🎓 Tổng kết</h2>
+            <p>
+                Properties trong Java là cách để thực hiện encapsulation và data hiding. 
+                Sử dụng getter/setter methods giúp bạn kiểm soát việc truy cập và modification của data, 
+                đồng thời có thể thêm validation, logging, và other business logic.
+            </p>
+
+            <h2>🔗 Bài viết liên quan</h2>
+            <ul>
+                <li><a href="java-objects.html">Objects trong Java</a></li>
+                <li><a href="java-dot-bracket.html">Dot vs Bracket Notation</a></li>
+                <li><a href="../blog.html">Xem tất cả bài viết</a></li>
+            </ul>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevBlog. Made with ❤️ for the programming community.</p>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

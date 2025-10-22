@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>References trong JavaScript - DevBlog</title>
+    <meta name="description" content="Hiểu sâu về cách JavaScript xử lý references, pass by value vs pass by reference và memory management.">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DevBlog</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../blog.html" class="nav-link">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Article Content -->
+    <article class="article">
+        <a href="../blog.html" class="back-btn">← Quay lại Blog</a>
+        
+        <header class="article-header">
+            <h1 class="article-title">References trong JavaScript</h1>
+            <div class="article-meta">
+                <span class="blog-category">JavaScript</span> • 
+                Đăng ngày 29/09/2024 • 
+                8 phút đọc
+            </div>
+        </header>
+
+        <div class="article-content">
+            <h2>📖 References là gì?</h2>
+            <p>
+                References trong JavaScript là cách ngôn ngữ quản lý memory và truy cập đến objects. 
+                Hiểu rõ về references là chìa khóa để master JavaScript và tránh những bugs phổ biến 
+                liên quan đến mutation và memory leaks.
+            </p>
+
+            <h2>🔄 Pass by Value vs Pass by Reference</h2>
+
+            <h3>Primitive Types - Pass by Value</h3>
+            <div class="code-block">
+                <code>// Primitive types: number, string, boolean, null, undefined, symbol, bigint
+let a = 10;
+let b = a;  // Copy value, không phải reference
+
+b = 20;
+
+console.log(a); // 10 - không thay đổi
+console.log(b); // 20
+
+// Function parameters với primitives
+function changeValue(x) {
+    x = 100;
+    console.log('Inside function:', x); // 100
+}
+
+let num = 50;
+changeValue(num);
+console.log('Outside function:', num); // 50 - không thay đổi</code>
+            </div>
+
+            <h3>Objects - Pass by Reference</h3>
+            <div class="code-block">
+                <code>// Objects, arrays, functions được pass by reference
+let obj1 = { name: 'John', age: 25 };
+let obj2 = obj1;  // Copy reference, không phải copy object
+
+obj2.age = 30;
+
+console.log(obj1.age); // 30 - cả hai đều thay đổi!
+console.log(obj2.age); // 30
+
+// Function parameters với objects
+function modifyObject(obj) {
+    obj.name = 'Jane';
+    obj.newProp = 'Added';
+}
+
+let person = { name: 'John', age: 25 };
+modifyObject(person);
+console.log(person); // { name: 'Jane', age: 25, newProp: 'Added' }</code>
+            </div>
+
+            <h2>🎯 Reference Equality vs Value Equality</h2>
+            <div class="code-block">
+                <code>// Reference equality
+let arr1 = [1, 2, 3];
+let arr2 = [1, 2, 3];
+let arr3 = arr1;
+
+console.log(arr1 === arr2); // false - khác reference
+console.log(arr1 === arr3); // true - cùng reference
+
+// Object comparison
+let obj1 = { x: 1, y: 2 };
+let obj2 = { x: 1, y: 2 };
+let obj3 = obj1;
+
+console.log(obj1 === obj2); // false - khác reference
+console.log(obj1 === obj3); // true - cùng reference
+
+// Deep equality check
+function deepEqual(a, b) {
+    if (a === b) return true;
+    
+    if (a == null || b == null) return false;
+    
+    if (typeof a !== 'object' || typeof b !== 'object') return a === b;
+    
+    let keysA = Object.keys(a);
+    let keysB = Object.keys(b);
+    
+    if (keysA.length !== keysB.length) return false;
+    
+    for (let key of keysA) {
+        if (!keysB.includes(key) || !deepEqual(a[key], b[key])) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+console.log(deepEqual(obj1, obj2)); // true - same content</code>
+            </div>
+
+            <h2>📋 Array References</h2>
+            <div class="code-block">
+                <code>// Array references
+let original = [1, 2, 3];
+let reference = original;
+let shallowCopy = [...original];  // Shallow copy
+let deepCopy = JSON.parse(JSON.stringify(original)); // Deep copy (limited)
+
+// Modify original
+original.push(4);
+
+console.log(original);    // [1, 2, 3, 4]
+console.log(reference);   // [1, 2, 3, 4] - same reference
+console.log(shallowCopy); // [1, 2, 3] - different reference
+console.log(deepCopy);    // [1, 2, 3] - different reference
+
+// Nested objects trong arrays
+let complexArray = [
+    { id: 1, data: { value: 10 } },
+    { id: 2, data: { value: 20 } }
+];
+
+let shallowArrayCopy = [...complexArray];
+let deepArrayCopy = complexArray.map(item => ({
+    ...item,
+    data: { ...item.data }
+}));
+
+// Modify nested object
+complexArray[0].data.value = 100;
+
+console.log(complexArray[0].data.value);    // 100
+console.log(shallowArrayCopy[0].data.value); // 100 - shallow copy!
+console.log(deepArrayCopy[0].data.value);    // 10 - deep copy</code>
+            </div>
+
+            <h2>🔄 Object Copying Strategies</h2>
+
+            <h3>Shallow Copy</h3>
+            <div class="code-block">
+                <code>let original = {
+    name: 'John',
+    age: 30,
+    address: {
+        city: 'New York',
+        country: 'USA'
+    },
+    hobbies: ['reading', 'coding']
+};
+
+// Shallow copy methods
+let copy1 = Object.assign({}, original);
+let copy2 = { ...original };
+let copy3 = Object.create(original);
+
+// Modify nested property
+original.address.city = 'Los Angeles';
+original.hobbies.push('gaming');
+
+console.log(copy1.address.city); // 'Los Angeles' - shallow copy!
+console.log(copy2.hobbies);       // ['reading', 'coding', 'gaming']</code>
+            </div>
+
+            <h3>Deep Copy</h3>
+            <div class="code-block">
+                <code>// Deep copy methods
+
+// 1. JSON method (limited - không work với functions, undefined, Symbol)
+function jsonDeepCopy(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+
+// 2. Recursive deep copy
+function deepCopy(obj) {
+    if (obj === null || typeof obj !== 'object') {
+        return obj;
+    }
+    
+    if (obj instanceof Date) {
+        return new Date(obj.getTime());
+    }
+    
+    if (obj instanceof Array) {
+        return obj.map(item => deepCopy(item));
+    }
+    
+    if (typeof obj === 'object') {
+        const copy = {};
+        Object.keys(obj).forEach(key => {
+            copy[key] = deepCopy(obj[key]);
+        });
+        return copy;
+    }
+}
+
+// 3. Using Lodash library
+// let deepCopyLodash = _.cloneDeep(original);
+
+// 4. Using structuredClone (modern browsers)
+let modernDeepCopy = structuredClone(original);
+
+// Test deep copy
+let originalWithFunction = {
+    name: 'John',
+    greet: function() { return 'Hello!'; },
+    data: { value: 42 }
+};
+
+let jsonCopy = jsonDeepCopy(originalWithFunction);
+let recursiveCopy = deepCopy(originalWithFunction);
+
+console.log(jsonCopy.greet);      // undefined - JSON không support functions
+console.log(recursiveCopy.greet); // function - preserved</code>
+            </div>
+
+            <h2>⚠️ Common Reference Pitfalls</h2>
+
+            <h3>1. Unintended Mutations</h3>
+            <div class="code-block">
+                <code>// Pitfall: Unintended mutation
+function processUser(user) {
+    user.processed = true;  // Mutates original object!
+    user.name = user.name.toUpperCase();
+    return user;
+}
+
+let originalUser = { name: 'john', age: 25 };
+let processedUser = processUser(originalUser);
+
+console.log(originalUser);  // { name: 'JOHN', age: 25, processed: true }
+console.log(processedUser); // Same object!
+
+// Solution: Work with copies
+function processUserSafe(user) {
+    let userCopy = { ...user };
+    userCopy.processed = true;
+    userCopy.name = userCopy.name.toUpperCase();
+    return userCopy;
+}</code>
+            </div>
+
+            <h3>2. Array Methods và References</h3>
+            <div class="code-block">
+                <code>let numbers = [1, 2, 3, 4, 5];
+
+// Mutating methods (modify original array)
+let mutatingResult = numbers.sort(); // sorts original
+console.log(numbers);        // [1, 2, 3, 4, 5] - sorted
+console.log(mutatingResult); // Same reference
+
+// Non-mutating methods (return new array)
+let nonMutatingResult = numbers.map(x => x * 2);
+console.log(numbers);           // [1, 2, 3, 4, 5] - unchanged
+console.log(nonMutatingResult); // [2, 4, 6, 8, 10] - new array
+
+// Safe sorting
+let sortedCopy = [...numbers].sort();
+// or
+let sortedCopyAlt = numbers.slice().sort();</code>
+            </div>
+
+            <h3>3. Closure và References</h3>
+            <div class="code-block">
+                <code>// Pitfall: Closures capturing references
+let handlers = [];
+let obj = { value: 0 };
+
+for (let i = 0; i < 3; i++) {
+    handlers.push(() => {
+        obj.value = i;  // All closures reference same obj!
+        return obj.value;
+    });
+}
+
+// All handlers modify the same object
+console.log(handlers[0]()); // 0
+console.log(handlers[1]()); // 1  
+console.log(handlers[2]()); // 2
+console.log(obj.value);     // 2 - last value
+
+// Solution: Create separate objects
+let safeHandlers = [];
+for (let i = 0; i < 3; i++) {
+    let localObj = { value: i }; // Separate object for each iteration
+    safeHandlers.push(() => localObj.value);
+}</code>
+            </div>
+
+            <h2>🚀 Advanced Reference Concepts</h2>
+
+            <h3>WeakMap và WeakSet</h3>
+            <div class="code-block">
+                <code>// WeakMap - weak references to objects
+let wm = new WeakMap();
+let obj1 = { name: 'John' };
+let obj2 = { name: 'Jane' };
+
+wm.set(obj1, 'extra data for obj1');
+wm.set(obj2, 'extra data for obj2');
+
+console.log(wm.get(obj1)); // 'extra data for obj1'
+
+// When obj1 is no longer referenced elsewhere, it can be garbage collected
+obj1 = null; // WeakMap entry will be automatically removed
+
+// WeakSet - weak references in sets
+let ws = new WeakSet();
+let objA = { id: 1 };
+let objB = { id: 2 };
+
+ws.add(objA);
+ws.add(objB);
+
+console.log(ws.has(objA)); // true
+
+objA = null; // Object can be garbage collected</code>
+            </div>
+
+            <h3>Proxy và References</h3>
+            <div class="code-block">
+                <code>// Proxy để intercept reference operations
+let target = {
+    name: 'John',
+    age: 30
+};
+
+let proxy = new Proxy(target, {
+    get(target, property) {
+        console.log(`Getting ${property}`);
+        return target[property];
+    },
+    
+    set(target, property, value) {
+        console.log(`Setting ${property} to ${value}`);
+        target[property] = value;
+        return true;
+    }
+});
+
+// Accessing through proxy
+console.log(proxy.name); // Logs: "Getting name", then "John"
+proxy.age = 31;          // Logs: "Setting age to 31"
+
+// Original object is modified
+console.log(target.age); // 31</code>
+            </div>
+
+            <h2>💡 Best Practices</h2>
+
+            <h3>1. Immutable Updates</h3>
+            <div class="code-block">
+                <code>// Immutable object updates
+const updateObject = (obj, updates) => ({
+    ...obj,
+    ...updates
+});
+
+// Immutable array updates
+const addToArray = (arr, item) => [...arr, item];
+const removeFromArray = (arr, index) => [
+    ...arr.slice(0, index),
+    ...arr.slice(index + 1)
+];
+const updateArrayItem = (arr, index, newItem) => [
+    ...arr.slice(0, index),
+    newItem,
+    ...arr.slice(index + 1)
+];
+
+// Usage
+let user = { name: 'John', age: 30 };
+let updatedUser = updateObject(user, { age: 31, city: 'NYC' });
+
+console.log(user);        // { name: 'John', age: 30 } - unchanged
+console.log(updatedUser); // { name: 'John', age: 31, city: 'NYC' }</code>
+            </div>
+
+            <h3>2. Reference Checking</h3>
+            <div class="code-block">
+                <code>// Utility functions for reference checking
+const isSameReference = (a, b) => a === b;
+
+const hasSharedReferences = (obj1, obj2) => {
+    for (let key in obj1) {
+        if (typeof obj1[key] === 'object' && obj1[key] === obj2[key]) {
+            return true;
+        }
+    }
+    return false;
+};
+
+// Memory leak detection
+const findCircularReferences = (obj, seen = new WeakSet()) => {
+    if (typeof obj !== 'object' || obj === null) return false;
+    
+    if (seen.has(obj)) return true;
+    
+    seen.add(obj);
+    
+    for (let key in obj) {
+        if (findCircularReferences(obj[key], seen)) {
+            return true;
+        }
+    }
+    
+    return false;
+};</code>
+            </div>
+
+            <h2>🎓 Tổng kết</h2>
+            <p>
+                Hiểu rõ về references trong JavaScript là fundamental để viết code hiệu quả và tránh bugs. 
+                Key takeaways:
+            </p>
+            <ul>
+                <li>Primitives: pass by value, Objects: pass by reference</li>
+                <li>Shallow copy vs Deep copy</li>
+                <li>Immutable programming patterns</li>
+                <li>Memory management và garbage collection</li>
+                <li>WeakMap/WeakSet cho advanced use cases</li>
+            </ul>
+
+            <h2>🔗 Bài viết liên quan</h2>
+            <ul>
+                <li><a href="js-methods.html">Methods trong JavaScript</a></li>
+                <li><a href="js-object-config.html">Object Configuration</a></li>
+                <li><a href="../blog.html">Xem tất cả bài viết</a></li>
+            </ul>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevBlog. Made with ❤️ for the programming community.</p>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

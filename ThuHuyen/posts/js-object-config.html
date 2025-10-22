@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Configuration trong JavaScript - DevBlog</title>
+    <meta name="description" content="Khám phá các cách configure objects trong JavaScript: property descriptors, getters/setters và advanced patterns.">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DevBlog</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../blog.html" class="nav-link">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Article Content -->
+    <article class="article">
+        <a href="../blog.html" class="back-btn">← Quay lại Blog</a>
+        
+        <header class="article-header">
+            <h1 class="article-title">Object Configuration trong JavaScript</h1>
+            <div class="article-meta">
+                <span class="blog-category">JavaScript</span> • 
+                Đăng ngày 29/09/2024 • 
+                8 phút đọc
+            </div>
+        </header>
+
+        <div class="article-content">
+            <h2>📖 Object Configuration là gì?</h2>
+            <p>
+                Object configuration trong JavaScript là việc kiểm soát cách properties của objects 
+                hoạt động thông qua property descriptors, getters/setters, và các advanced features 
+                như Proxy. Điều này cho phép tạo ra objects với behavior phức tạp và kiểm soát chặt chẽ.
+            </p>
+
+            <h2>🔧 Property Descriptors</h2>
+            <p>Mỗi property trong JavaScript có một descriptor định nghĩa behavior của nó:</p>
+
+            <h3>Data Descriptors</h3>
+            <div class="code-block">
+                <code>const obj = {};
+
+// Define property với full descriptor
+Object.defineProperty(obj, 'name', {
+    value: 'John',
+    writable: true,      // Có thể modify value
+    enumerable: true,    // Hiển thị trong for...in, Object.keys()
+    configurable: true   // Có thể delete hoặc modify descriptor
+});
+
+// Get property descriptor
+const descriptor = Object.getOwnPropertyDescriptor(obj, 'name');
+console.log(descriptor);
+// {
+//   value: 'John',
+//   writable: true,
+//   enumerable: true,
+//   configurable: true
+// }
+
+// Define read-only property
+Object.defineProperty(obj, 'id', {
+    value: 123,
+    writable: false,     // Read-only
+    enumerable: true,
+    configurable: false  // Cannot delete or reconfigure
+});
+
+obj.id = 456; // Fails silently (throws error in strict mode)
+console.log(obj.id); // 123
+
+// Define hidden property
+Object.defineProperty(obj, 'secret', {
+    value: 'hidden data',
+    writable: true,
+    enumerable: false,   // Won't show in Object.keys()
+    configurable: true
+});
+
+console.log(Object.keys(obj)); // ['name'] - 'secret' is hidden</code>
+            </div>
+
+            <h3>Accessor Descriptors (Getters/Setters)</h3>
+            <div class="code-block">
+                <code>const person = {};
+
+Object.defineProperty(person, 'fullName', {
+    get() {
+        return `${this.firstName} ${this.lastName}`;
+    },
+    
+    set(value) {
+        const parts = value.split(' ');
+        this.firstName = parts[0];
+        this.lastName = parts[1];
+    },
+    
+    enumerable: true,
+    configurable: true
+});
+
+// Usage
+person.fullName = 'John Doe';
+console.log(person.firstName); // 'John'
+console.log(person.lastName);  // 'Doe'
+console.log(person.fullName);  // 'John Doe'
+
+// Computed property với getter
+Object.defineProperty(person, 'age', {
+    get() {
+        if (this.birthYear) {
+            return new Date().getFullYear() - this.birthYear;
+        }
+        return undefined;
+    },
+    
+    enumerable: true,
+    configurable: true
+});
+
+person.birthYear = 1990;
+console.log(person.age); // Current year - 1990</code>
+            </div>
+
+            <h2>🏗️ Object.defineProperties() - Multiple Properties</h2>
+            <div class="code-block">
+                <code>const config = {};
+
+Object.defineProperties(config, {
+    // Data property
+    version: {
+        value: '1.0.0',
+        writable: false,
+        enumerable: true,
+        configurable: false
+    },
+    
+    // Hidden property
+    apiKey: {
+        value: 'secret-key-123',
+        writable: false,
+        enumerable: false,
+        configurable: false
+    },
+    
+    // Getter/Setter property
+    environment: {
+        get() {
+            return this._env || 'development';
+        },
+        
+        set(value) {
+            const validEnvs = ['development', 'staging', 'production'];
+            if (validEnvs.includes(value)) {
+                this._env = value;
+            } else {
+                throw new Error(`Invalid environment: ${value}`);
+            }
+        },
+        
+        enumerable: true,
+        configurable: true
+    },
+    
+    // Computed property
+    isProduction: {
+        get() {
+            return this.environment === 'production';
+        },
+        
+        enumerable: true,
+        configurable: false
+    }
+});
+
+// Usage
+config.environment = 'production';
+console.log(config.isProduction); // true
+console.log(Object.keys(config)); // ['version', 'environment', 'isProduction']</code>
+            </div>
+
+            <h2>🛡️ Object Protection Methods</h2>
+
+            <h3>Object.preventExtensions()</h3>
+            <div class="code-block">
+                <code>const obj = { name: 'John' };
+
+// Prevent adding new properties
+Object.preventExtensions(obj);
+
+obj.age = 30; // Fails silently
+console.log(obj.age); // undefined
+
+// Existing properties can still be modified
+obj.name = 'Jane';
+console.log(obj.name); // 'Jane'
+
+console.log(Object.isExtensible(obj)); // false</code>
+            </div>
+
+            <h3>Object.seal()</h3>
+            <div class="code-block">
+                <code>const obj = { name: 'John', age: 30 };
+
+// Seal object: no new properties, no deletion, but can modify values
+Object.seal(obj);
+
+obj.email = 'john@example.com'; // Fails
+delete obj.age; // Fails
+
+obj.name = 'Jane'; // Works - can modify existing properties
+console.log(obj.name); // 'Jane'
+
+console.log(Object.isSealed(obj)); // true</code>
+            </div>
+
+            <h3>Object.freeze()</h3>
+            <div class="code-block">
+                <code>const obj = { name: 'John', age: 30 };
+
+// Freeze object: completely immutable
+Object.freeze(obj);
+
+obj.name = 'Jane';  // Fails
+obj.email = 'john@example.com'; // Fails
+delete obj.age; // Fails
+
+console.log(obj.name); // 'John' - unchanged
+console.log(Object.isFrozen(obj)); // true
+
+// Deep freeze function
+function deepFreeze(obj) {
+    // Get property names
+    Object.getOwnPropertyNames(obj).forEach(prop => {
+        const value = obj[prop];
+        
+        // Freeze nested objects
+        if (value && typeof value === 'object') {
+            deepFreeze(value);
+        }
+    });
+    
+    return Object.freeze(obj);
+}
+
+const nestedObj = {
+    user: { name: 'John', profile: { age: 30 } }
+};
+
+deepFreeze(nestedObj);
+nestedObj.user.profile.age = 31; // Fails
+console.log(nestedObj.user.profile.age); // 30</code>
+            </div>
+
+            <h2>🎭 Proxy - Advanced Object Configuration</h2>
+            <div class="code-block">
+                <code>// Proxy cho advanced object behavior
+const createSmartObject = (initialData = {}) => {
+    const data = { ...initialData };
+    const accessLog = [];
+    
+    return new Proxy(data, {
+        // Intercept property access
+        get(target, property) {
+            accessLog.push({ type: 'get', property, timestamp: Date.now() });
+            
+            if (property === '_accessLog') {
+                return accessLog;
+            }
+            
+            if (property === '_keys') {
+                return Object.keys(target);
+            }
+            
+            return target[property];
+        },
+        
+        // Intercept property assignment
+        set(target, property, value) {
+            accessLog.push({ type: 'set', property, value, timestamp: Date.now() });
+            
+            // Validation
+            if (property === 'age' && (value < 0 || value > 150)) {
+                throw new Error('Invalid age value');
+            }
+            
+            target[property] = value;
+            return true;
+        },
+        
+        // Intercept property deletion
+        deleteProperty(target, property) {
+            if (property.startsWith('_')) {
+                throw new Error('Cannot delete private properties');
+            }
+            
+            accessLog.push({ type: 'delete', property, timestamp: Date.now() });
+            delete target[property];
+            return true;
+        },
+        
+        // Intercept property enumeration
+        ownKeys(target) {
+            return Object.keys(target).filter(key => !key.startsWith('_'));
+        },
+        
+        // Intercept property descriptor access
+        getOwnPropertyDescriptor(target, property) {
+            if (property.startsWith('_')) {
+                return undefined; // Hide private properties
+            }
+            return Object.getOwnPropertyDescriptor(target, property);
+        }
+    });
+};
+
+// Usage
+const smartObj = createSmartObject({ name: 'John', age: 30 });
+
+smartObj.age = 31;
+smartObj.email = 'john@example.com';
+delete smartObj.email;
+
+console.log(smartObj._accessLog);
+// [
+//   { type: 'set', property: 'age', value: 31, timestamp: ... },
+//   { type: 'set', property: 'email', value: 'john@example.com', timestamp: ... },
+//   { type: 'delete', property: 'email', timestamp: ... }
+// ]
+
+console.log(Object.keys(smartObj)); // ['name', 'age'] - private props hidden</code>
+            </div>
+
+            <h2>🔄 Reactive Objects với Proxy</h2>
+            <div class="code-block">
+                <code>// Create reactive object that notifies on changes
+function createReactive(target, callback) {
+    return new Proxy(target, {
+        set(obj, prop, value) {
+            const oldValue = obj[prop];
+            obj[prop] = value;
+            
+            // Notify callback of change
+            callback({
+                type: 'change',
+                property: prop,
+                oldValue,
+                newValue: value,
+                target: obj
+            });
+            
+            return true;
+        },
+        
+        deleteProperty(obj, prop) {
+            const oldValue = obj[prop];
+            delete obj[prop];
+            
+            callback({
+                type: 'delete',
+                property: prop,
+                oldValue,
+                target: obj
+            });
+            
+            return true;
+        }
+    });
+}
+
+// Usage
+const reactiveUser = createReactive(
+    { name: 'John', age: 30 },
+    (event) => {
+        console.log('User changed:', event);
+    }
+);
+
+reactiveUser.age = 31;  // Triggers callback
+reactiveUser.email = 'john@example.com'; // Triggers callback
+delete reactiveUser.email; // Triggers callback</code>
+            </div>
+
+            <h2>🎯 Practical Configuration Patterns</h2>
+
+            <h3>1. Configuration Object với Validation</h3>
+            <div class="code-block">
+                <code>class AppConfig {
+    constructor(initialConfig = {}) {
+        this._config = {};
+        this._validators = new Map();
+        this._locked = false;
+        
+        // Set up initial configuration
+        Object.assign(this._config, initialConfig);
+        
+        // Create proxy for validation
+        return new Proxy(this, {
+            get(target, prop) {
+                if (prop in target) {
+                    return target[prop];
+                }
+                return target._config[prop];
+            },
+            
+            set(target, prop, value) {
+                if (target._locked) {
+                    throw new Error('Configuration is locked');
+                }
+                
+                if (target._validators.has(prop)) {
+                    const validator = target._validators.get(prop);
+                    if (!validator(value)) {
+                        throw new Error(`Invalid value for ${prop}: ${value}`);
+                    }
+                }
+                
+                target._config[prop] = value;
+                return true;
+            }
+        });
+    }
+    
+    // Add validator for a property
+    addValidator(property, validatorFn) {
+        this._validators.set(property, validatorFn);
+        return this;
+    }
+    
+    // Lock configuration (make read-only)
+    lock() {
+        this._locked = true;
+        return this;
+    }
+    
+    // Get all configuration keys
+    keys() {
+        return Object.keys(this._config);
+    }
+    
+    // Get configuration as plain object
+    toObject() {
+        return { ...this._config };
+    }
+}
+
+// Usage
+const config = new AppConfig({ port: 3000, host: 'localhost' })
+    .addValidator('port', (port) => port > 0 && port < 65536)
+    .addValidator('host', (host) => typeof host === 'string' && host.length > 0);
+
+config.port = 8080; // OK
+config.database = 'mongodb://localhost'; // OK
+
+try {
+    config.port = -1; // Throws error
+} catch (error) {
+    console.log(error.message); // "Invalid value for port: -1"
+}
+
+config.lock(); // Lock configuration
+
+try {
+    config.port = 9000; // Throws error
+} catch (error) {
+    console.log(error.message); // "Configuration is locked"
+}</code>
+            </div>
+
+            <h3>2. Observable Object Pattern</h3>
+            <div class="code-block">
+                <code>class Observable {
+    constructor(data = {}) {
+        this._data = data;
+        this._observers = [];
+        
+        return new Proxy(this, {
+            get(target, prop) {
+                if (prop in target) {
+                    return target[prop];
+                }
+                return target._data[prop];
+            },
+            
+            set(target, prop, value) {
+                if (prop.startsWith('_')) {
+                    target[prop] = value;
+                    return true;
+                }
+                
+                const oldValue = target._data[prop];
+                target._data[prop] = value;
+                
+                // Notify observers
+                target._notifyObservers(prop, oldValue, value);
+                return true;
+            }
+        });
+    }
+    
+    // Subscribe to changes
+    subscribe(callback) {
+        this._observers.push(callback);
+        return () => {
+            // Return unsubscribe function
+            const index = this._observers.indexOf(callback);
+            if (index > -1) {
+                this._observers.splice(index, 1);
+            }
+        };
+    }
+    
+    // Notify all observers
+    _notifyObservers(property, oldValue, newValue) {
+        this._observers.forEach(callback => {
+            callback({ property, oldValue, newValue, target: this._data });
+        });
+    }
+    
+    // Get snapshot of data
+    getData() {
+        return { ...this._data };
+    }
+}
+
+// Usage
+const user = new Observable({ name: 'John', age: 30 });
+
+const unsubscribe = user.subscribe((event) => {
+    console.log(`${event.property} changed from ${event.oldValue} to ${event.newValue}`);
+});
+
+user.name = 'Jane';  // Logs: "name changed from John to Jane"
+user.age = 31;       // Logs: "age changed from 30 to 31"
+
+unsubscribe(); // Stop observing
+user.name = 'Bob';   // No log (unsubscribed)</code>
+            </div>
+
+            <h2>⚡ Performance Considerations</h2>
+            <ul>
+                <li><strong>Property descriptors:</strong> có overhead nhỏ so với regular properties</li>
+                <li><strong>Proxy:</strong> có performance cost, tránh cho hot paths</li>
+                <li><strong>Getters/Setters:</strong> cache expensive computations</li>
+                <li><strong>Object.freeze():</strong> deep freeze có thể chậm cho large objects</li>
+            </ul>
+
+            <h2>🎓 Tổng kết</h2>
+            <p>
+                Object configuration trong JavaScript cung cấp powerful tools để kiểm soát object behavior. 
+                Key concepts:
+            </p>
+            <ul>
+                <li><strong>Property descriptors:</strong> Control property behavior</li>
+                <li><strong>Object protection:</strong> preventExtensions, seal, freeze</li>
+                <li><strong>Proxy:</strong> Advanced object interception</li>
+                <li><strong>Getters/Setters:</strong> Computed và validated properties</li>
+                <li><strong>Patterns:</strong> Reactive objects, configuration management</li>
+            </ul>
+
+            <h2>🔗 Bài viết liên quan</h2>
+            <ul>
+                <li><a href="js-create-objects.html">Các cách tạo Objects khác</a></li>
+                <li><a href="js-methods.html">Methods trong JavaScript</a></li>
+                <li><a href="../blog.html">Xem tất cả bài viết</a></li>
+            </ul>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevBlog. Made with ❤️ for the programming community.</p>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

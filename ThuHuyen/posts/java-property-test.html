@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Existence Test trong Java - DevBlog</title>
+    <meta name="description" content="Hướng dẫn các cách kiểm tra sự tồn tại của properties trong Java objects sử dụng reflection và annotations.">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DevBlog</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../blog.html" class="nav-link">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Article Content -->
+    <article class="article">
+        <a href="../blog.html" class="back-btn">← Quay lại Blog</a>
+        
+        <header class="article-header">
+            <h1 class="article-title">Property Existence Test trong Java</h1>
+            <div class="article-meta">
+                <span class="blog-category">Java</span> • 
+                Đăng ngày 29/09/2024 • 
+                7 phút đọc
+            </div>
+        </header>
+
+        <div class="article-content">
+            <h2>📖 Giới thiệu</h2>
+            <p>
+                Trong Java, việc kiểm tra sự tồn tại của properties không đơn giản như trong JavaScript. 
+                Java là strongly typed language, nên chúng ta cần sử dụng Reflection API, 
+                Bean Introspection hoặc các utility libraries để thực hiện điều này.
+            </p>
+
+            <h2>🔍 Reflection API - Field Check</h2>
+            
+            <h3>Kiểm tra Field tồn tại</h3>
+            <div class="code-block">
+                <code>import java.lang.reflect.Field;
+
+public class Student {
+    private String name;
+    private int age;
+    public String email;
+    protected String address;
+    
+    // Constructors, getters, setters...
+}
+
+public class FieldExistenceChecker {
+    
+    // Kiểm tra field tồn tại (tất cả access levels)
+    public static boolean hasField(Class<?> clazz, String fieldName) {
+        try {
+            clazz.getDeclaredField(fieldName);
+            return true;
+        } catch (NoSuchFieldException e) {
+            return false;
+        }
+    }
+    
+    // Kiểm tra public field
+    public static boolean hasPublicField(Class<?> clazz, String fieldName) {
+        try {
+            clazz.getField(fieldName);
+            return true;
+        } catch (NoSuchFieldException e) {
+            return false;
+        }
+    }
+    
+    // Kiểm tra field trong class hierarchy
+    public static boolean hasFieldInHierarchy(Class<?> clazz, String fieldName) {
+        Class<?> currentClass = clazz;
+        while (currentClass != null) {
+            try {
+                currentClass.getDeclaredField(fieldName);
+                return true;
+            } catch (NoSuchFieldException e) {
+                currentClass = currentClass.getSuperclass();
+            }
+        }
+        return false;
+    }
+    
+    public static void main(String[] args) {
+        Class<Student> studentClass = Student.class;
+        
+        System.out.println(hasField(studentClass, "name"));     // true
+        System.out.println(hasField(studentClass, "age"));      // true
+        System.out.println(hasField(studentClass, "phone"));    // false
+        
+        System.out.println(hasPublicField(studentClass, "email"));   // true
+        System.out.println(hasPublicField(studentClass, "name"));    // false (private)
+    }
+}</code>
+            </div>
+
+            <h3>Lấy Field Information</h3>
+            <div class="code-block">
+                <code>import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
+public class FieldAnalyzer {
+    
+    public static void analyzeField(Class<?> clazz, String fieldName) {
+        try {
+            Field field = clazz.getDeclaredField(fieldName);
+            
+            System.out.println("Field: " + fieldName);
+            System.out.println("Type: " + field.getType().getSimpleName());
+            System.out.println("Modifiers: " + Modifier.toString(field.getModifiers()));
+            System.out.println("Accessible: " + field.isAccessible());
+            
+            // Annotations
+            if (field.getAnnotations().length > 0) {
+                System.out.println("Annotations:");
+                for (var annotation : field.getAnnotations()) {
+                    System.out.println("  - " + annotation.annotationType().getSimpleName());
+                }
+            }
+            
+        } catch (NoSuchFieldException e) {
+            System.out.println("Field '" + fieldName + "' not found!");
+        }
+    }
+    
+    // Liệt kê tất cả fields
+    public static void listAllFields(Class<?> clazz) {
+        System.out.println("All declared fields in " + clazz.getSimpleName() + ":");
+        
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            String modifiers = Modifier.toString(field.getModifiers());
+            String type = field.getType().getSimpleName();
+            String name = field.getName();
+            
+            System.out.println("  " + modifiers + " " + type + " " + name);
+        }
+    }
+}</code>
+            </div>
+
+            <h2>🍃 Bean Introspection</h2>
+            <div class="code-block">
+                <code>import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+
+public class PropertyChecker {
+    
+    // Kiểm tra property (getter/setter methods)
+    public static boolean hasProperty(Class<?> clazz, String propertyName) {
+        try {
+            BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
+            PropertyDescriptor[] properties = beanInfo.getPropertyDescriptors();
+            
+            for (PropertyDescriptor property : properties) {
+                if (property.getName().equals(propertyName)) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (IntrospectionException e) {
+            return false;
+        }
+    }
+    
+    // Kiểm tra readable property (có getter)
+    public static boolean hasReadableProperty(Class<?> clazz, String propertyName) {
+        try {
+            BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
+            PropertyDescriptor[] properties = beanInfo.getPropertyDescriptors();
+            
+            for (PropertyDescriptor property : properties) {
+                if (property.getName().equals(propertyName)) {
+                    return property.getReadMethod() != null;
+                }
+            }
+            return false;
+        } catch (IntrospectionException e) {
+            return false;
+        }
+    }
+    
+    // Kiểm tra writable property (có setter)
+    public static boolean hasWritableProperty(Class<?> clazz, String propertyName) {
+        try {
+            BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
+            PropertyDescriptor[] properties = beanInfo.getPropertyDescriptors();
+            
+            for (PropertyDescriptor property : properties) {
+                if (property.getName().equals(propertyName)) {
+                    return property.getWriteMethod() != null;
+                }
+            }
+            return false;
+        } catch (IntrospectionException e) {
+            return false;
+        }
+    }
+    
+    // Liệt kê tất cả properties
+    public static void listProperties(Class<?> clazz) {
+        try {
+            BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
+            PropertyDescriptor[] properties = beanInfo.getPropertyDescriptors();
+            
+            System.out.println("Properties of " + clazz.getSimpleName() + ":");
+            for (PropertyDescriptor property : properties) {
+                String name = property.getName();
+                String type = property.getPropertyType().getSimpleName();
+                boolean readable = property.getReadMethod() != null;
+                boolean writable = property.getWriteMethod() != null;
+                
+                System.out.printf("  %s (%s) - R:%s W:%s%n", 
+                    name, type, readable, writable);
+            }
+        } catch (IntrospectionException e) {
+            e.printStackTrace();
+        }
+    }
+}</code>
+            </div>
+
+            <h2>🏷️ Annotation-based Checking</h2>
+            <div class="code-block">
+                <code>import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Field;
+
+// Custom annotation
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface Serializable {
+    boolean required() default false;
+}
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface Validation {
+    String pattern() default "";
+    int maxLength() default -1;
+}
+
+// Example class with annotations
+public class User {
+    @Serializable(required = true)
+    private String username;
+    
+    @Serializable
+    @Validation(pattern = "^[\\w._%+-]+@[\\w.-]+\\.[A-Za-z]{2,6}$")
+    private String email;
+    
+    private String password; // No annotation
+    
+    @Validation(maxLength = 100)
+    private String fullName;
+    
+    // Getters and setters...
+}
+
+public class AnnotationChecker {
+    
+    // Kiểm tra field có annotation cụ thể
+    public static boolean hasAnnotation(Class<?> clazz, String fieldName, 
+                                       Class<? extends Annotation> annotationClass) {
+        try {
+            Field field = clazz.getDeclaredField(fieldName);
+            return field.isAnnotationPresent(annotationClass);
+        } catch (NoSuchFieldException e) {
+            return false;
+        }
+    }
+    
+    // Lấy các field có annotation cụ thể
+    public static List<Field> getFieldsWithAnnotation(Class<?> clazz, 
+                                                     Class<? extends Annotation> annotationClass) {
+        List<Field> annotatedFields = new ArrayList<>();
+        Field[] fields = clazz.getDeclaredFields();
+        
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(annotationClass)) {
+                annotatedFields.add(field);
+            }
+        }
+        return annotatedFields;
+    }
+    
+    // Kiểm tra required serializable fields
+    public static boolean hasRequiredSerializableFields(Class<?> clazz) {
+        Field[] fields = clazz.getDeclaredFields();
+        
+        for (Field field : fields) {
+            Serializable annotation = field.getAnnotation(Serializable.class);
+            if (annotation != null && annotation.required()) {
+                return true;
+            }
+        }
+        return false;
+    }
+}</code>
+            </div>
+
+            <h2>🔧 Utility Class - Complete Solution</h2>
+            <div class="code-block">
+                <code>import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.*;
+
+public class PropertyUtils {
+    
+    // Comprehensive property existence check
+    public static boolean hasProperty(Object obj, String propertyName) {
+        if (obj == null || propertyName == null) {
+            return false;
+        }
+        
+        Class<?> clazz = obj.getClass();
+        
+        // Check field existence
+        if (hasField(clazz, propertyName)) {
+            return true;
+        }
+        
+        // Check getter method
+        if (hasGetter(clazz, propertyName)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    private static boolean hasField(Class<?> clazz, String fieldName) {
+        try {
+            clazz.getDeclaredField(fieldName);
+            return true;
+        } catch (NoSuchFieldException e) {
+            // Check superclasses
+            Class<?> superClass = clazz.getSuperclass();
+            if (superClass != null) {
+                return hasField(superClass, fieldName);
+            }
+            return false;
+        }
+    }
+    
+    private static boolean hasGetter(Class<?> clazz, String propertyName) {
+        String getterName = "get" + capitalize(propertyName);
+        String booleanGetterName = "is" + capitalize(propertyName);
+        
+        Method[] methods = clazz.getMethods();
+        for (Method method : methods) {
+            String methodName = method.getName();
+            if ((methodName.equals(getterName) || methodName.equals(booleanGetterName)) 
+                && method.getParameterCount() == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // Get property value dynamically
+    public static Object getPropertyValue(Object obj, String propertyName) {
+        try {
+            // Try field first
+            Field field = obj.getClass().getDeclaredField(propertyName);
+            field.setAccessible(true);
+            return field.get(obj);
+        } catch (Exception e) {
+            // Try getter method
+            try {
+                String getterName = "get" + capitalize(propertyName);
+                Method getter = obj.getClass().getMethod(getterName);
+                return getter.invoke(obj);
+            } catch (Exception ex) {
+                // Try boolean getter
+                try {
+                    String booleanGetterName = "is" + capitalize(propertyName);
+                    Method getter = obj.getClass().getMethod(booleanGetterName);
+                    return getter.invoke(obj);
+                } catch (Exception exc) {
+                    return null;
+                }
+            }
+        }
+    }
+    
+    // Set property value dynamically
+    public static boolean setPropertyValue(Object obj, String propertyName, Object value) {
+        try {
+            // Try field first
+            Field field = obj.getClass().getDeclaredField(propertyName);
+            field.setAccessible(true);
+            field.set(obj, value);
+            return true;
+        } catch (Exception e) {
+            // Try setter method
+            try {
+                String setterName = "set" + capitalize(propertyName);
+                Class<?> valueType = value != null ? value.getClass() : Object.class;
+                Method setter = obj.getClass().getMethod(setterName, valueType);
+                setter.invoke(obj, value);
+                return true;
+            } catch (Exception ex) {
+                return false;
+            }
+        }
+    }
+    
+    private static String capitalize(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+    
+    // Get all property names
+    public static Set<String> getPropertyNames(Class<?> clazz) {
+        Set<String> propertyNames = new HashSet<>();
+        
+        // Add field names
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            propertyNames.add(field.getName());
+        }
+        
+        // Add property names from methods
+        Method[] methods = clazz.getMethods();
+        for (Method method : methods) {
+            String methodName = method.getName();
+            if (methodName.startsWith("get") && methodName.length() > 3 
+                && method.getParameterCount() == 0) {
+                String propertyName = uncapitalize(methodName.substring(3));
+                propertyNames.add(propertyName);
+            } else if (methodName.startsWith("is") && methodName.length() > 2 
+                      && method.getParameterCount() == 0) {
+                String propertyName = uncapitalize(methodName.substring(2));
+                propertyNames.add(propertyName);
+            }
+        }
+        
+        return propertyNames;
+    }
+    
+    private static String uncapitalize(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        return str.substring(0, 1).toLowerCase() + str.substring(1);
+    }
+}</code>
+            </div>
+
+            <h2>📋 Sử dụng thực tế</h2>
+            <div class="code-block">
+                <code>public class PropertyTestExample {
+    public static void main(String[] args) {
+        Student student = new Student();
+        student.setName("John Doe");
+        student.setAge(20);
+        
+        // Test property existence
+        System.out.println("Has 'name' property: " + 
+            PropertyUtils.hasProperty(student, "name"));
+        System.out.println("Has 'phone' property: " + 
+            PropertyUtils.hasProperty(student, "phone"));
+        
+        // Get property value dynamically
+        Object name = PropertyUtils.getPropertyValue(student, "name");
+        System.out.println("Name: " + name);
+        
+        // Set property value dynamically
+        boolean success = PropertyUtils.setPropertyValue(student, "age", 25);
+        System.out.println("Set age success: " + success);
+        
+        // List all properties
+        Set<String> properties = PropertyUtils.getPropertyNames(Student.class);
+        System.out.println("All properties: " + properties);
+        
+        // Annotation checking
+        System.out.println("Has @Serializable annotation on email: " + 
+            AnnotationChecker.hasAnnotation(User.class, "email", Serializable.class));
+    }
+}</code>
+            </div>
+
+            <h2>⚡ Performance Considerations</h2>
+            <ul>
+                <li><strong>Caching:</strong> Cache reflection results để tránh repeated lookups</li>
+                <li><strong>Exception handling:</strong> Reflection có thể throw nhiều exceptions</li>
+                <li><strong>Security:</strong> setAccessible(true) có thể vi phạm encapsulation</li>
+                <li><strong>Type safety:</strong> Dynamic property access mất type safety</li>
+            </ul>
+
+            <h2>🎓 Tổng kết</h2>
+            <p>
+                Property existence testing trong Java đòi hỏi sử dụng Reflection API hoặc Bean Introspection. 
+                Mặc dù không đơn giản như JavaScript, nhưng Java cung cấp powerful tools để thực hiện 
+                dynamic property access một cách an toàn và hiệu quả.
+            </p>
+
+            <h2>🔗 Bài viết liên quan</h2>
+            <ul>
+                <li><a href="java-properties.html">Properties trong Java</a></li>
+                <li><a href="java-objects.html">Objects trong Java</a></li>
+                <li><a href="../blog.html">Xem tất cả bài viết</a></li>
+            </ul>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevBlog. Made with ❤️ for the programming community.</p>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

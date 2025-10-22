@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Các cách tạo Objects trong JavaScript - DevBlog</title>
+    <meta name="description" content="Tìm hiểu nhiều cách khác nhau để tạo objects trong JavaScript: constructor functions, factory functions, Object.create, classes và prototypes.">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DevBlog</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../blog.html" class="nav-link">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Article Content -->
+    <article class="article">
+        <a href="../blog.html" class="back-btn">← Quay lại Blog</a>
+        
+        <header class="article-header">
+            <h1 class="article-title">Các cách tạo Objects trong JavaScript</h1>
+            <div class="article-meta">
+                <span class="blog-category">JavaScript</span> • 
+                Đăng ngày 29/09/2024 • 
+                10 phút đọc
+            </div>
+        </header>
+
+        <div class="article-content">
+            <h2>📖 Giới thiệu</h2>
+            <p>
+                JavaScript cung cấp nhiều cách khác nhau để tạo objects, mỗi cách có ưu và nhược điểm riêng. 
+                Hiểu rõ các patterns này sẽ giúp bạn chọn approach phù hợp cho từng tình huống cụ thể.
+            </p>
+
+            <h2>🎯 1. Object Literals</h2>
+            <p>Cách đơn giản và phổ biến nhất:</p>
+            <div class="code-block">
+                <code>// Basic object literal
+const person = {
+    name: 'John',
+    age: 30,
+    city: 'New York',
+    
+    greet() {
+        return `Hello, I'm ${this.name}`;
+    }
+};
+
+// Computed property names (ES6)
+const propertyName = 'email';
+const user = {
+    name: 'Jane',
+    [propertyName]: 'jane@example.com',
+    ['is' + 'Active']: true
+};
+
+// Shorthand properties (ES6)
+const name = 'Bob';
+const age = 25;
+
+const shorthandUser = {
+    name,    // equivalent to name: name
+    age,     // equivalent to age: age
+    greet() {
+        return `I'm ${this.name}`;
+    }
+};
+
+console.log(shorthandUser.greet()); // "I'm Bob"</code>
+            </div>
+
+            <h2>🏭 2. Factory Functions</h2>
+            <p>Functions trả về objects mới:</p>
+            <div class="code-block">
+                <code>// Basic factory function
+function createPerson(name, age, city) {
+    return {
+        name,
+        age,
+        city,
+        
+        greet() {
+            return `Hello, I'm ${this.name} from ${this.city}`;
+        },
+        
+        getAge() {
+            return this.age;
+        },
+        
+        celebrateBirthday() {
+            this.age++;
+            return `Happy birthday! Now I'm ${this.age}`;
+        }
+    };
+}
+
+// Usage
+const john = createPerson('John', 30, 'New York');
+const jane = createPerson('Jane', 25, 'Los Angeles');
+
+console.log(john.greet());              // "Hello, I'm John from New York"
+console.log(jane.celebrateBirthday());  // "Happy birthday! Now I'm 26"
+
+// Advanced factory with private variables
+function createBankAccount(initialBalance = 0) {
+    let balance = initialBalance;
+    const transactions = [];
+    
+    return {
+        deposit(amount) {
+            if (amount > 0) {
+                balance += amount;
+                transactions.push({ type: 'deposit', amount, date: new Date() });
+            }
+            return this;
+        },
+        
+        withdraw(amount) {
+            if (amount > 0 && amount <= balance) {
+                balance -= amount;
+                transactions.push({ type: 'withdraw', amount, date: new Date() });
+            }
+            return this;
+        },
+        
+        getBalance() {
+            return balance;
+        },
+        
+        getTransactionHistory() {
+            return [...transactions]; // Return copy
+        }
+    };
+}
+
+const account = createBankAccount(1000);
+account.deposit(500).withdraw(200);
+console.log(account.getBalance()); // 1300</code>
+            </div>
+
+            <h2>🏗️ 3. Constructor Functions</h2>
+            <p>Functions được gọi với từ khóa <span class="inline-code">new</span>:</p>
+            <div class="code-block">
+                <code>// Constructor function
+function Person(name, age, city) {
+    this.name = name;
+    this.age = age;
+    this.city = city;
+}
+
+// Add methods to prototype
+Person.prototype.greet = function() {
+    return `Hello, I'm ${this.name}`;
+};
+
+Person.prototype.getAge = function() {
+    return this.age;
+};
+
+Person.prototype.celebrateBirthday = function() {
+    this.age++;
+    return `Happy birthday! Now I'm ${this.age}`;
+};
+
+// Usage
+const person1 = new Person('John', 30, 'New York');
+const person2 = new Person('Jane', 25, 'Los Angeles');
+
+console.log(person1.greet());                    // "Hello, I'm John"
+console.log(person1 instanceof Person);         // true
+console.log(person1.constructor === Person);    // true
+
+// Constructor with validation
+function Car(make, model, year) {
+    // Ensure called with 'new'
+    if (!(this instanceof Car)) {
+        return new Car(make, model, year);
+    }
+    
+    // Validation
+    if (!make || !model) {
+        throw new Error('Make and model are required');
+    }
+    
+    this.make = make;
+    this.model = model;
+    this.year = year || new Date().getFullYear();
+    this.mileage = 0;
+}
+
+Car.prototype.drive = function(miles) {
+    if (miles > 0) {
+        this.mileage += miles;
+    }
+    return this;
+};
+
+Car.prototype.getInfo = function() {
+    return `${this.year} ${this.make} ${this.model} - ${this.mileage} miles`;
+};
+
+const myCar = new Car('Toyota', 'Camry', 2020);
+myCar.drive(1000).drive(500);
+console.log(myCar.getInfo()); // "2020 Toyota Camry - 1500 miles"</code>
+            </div>
+
+            <h2>🎭 4. Classes (ES6)</h2>
+            <p>Syntactic sugar cho constructor functions và prototypes:</p>
+            <div class="code-block">
+                <code>class Animal {
+    constructor(name, species) {
+        this.name = name;
+        this.species = species;
+    }
+    
+    // Instance method
+    speak() {
+        return `${this.name} makes a sound`;
+    }
+    
+    // Getter
+    get info() {
+        return `${this.name} is a ${this.species}`;
+    }
+    
+    // Setter
+    set name(newName) {
+        if (newName && newName.length > 0) {
+            this._name = newName;
+        }
+    }
+    
+    get name() {
+        return this._name;
+    }
+    
+    // Static method
+    static compare(animal1, animal2) {
+        return animal1.name.localeCompare(animal2.name);
+    }
+}
+
+// Inheritance
+class Dog extends Animal {
+    constructor(name, breed) {
+        super(name, 'Dog');
+        this.breed = breed;
+    }
+    
+    // Override parent method
+    speak() {
+        return `${this.name} barks!`;
+    }
+    
+    // Additional method
+    fetch() {
+        return `${this.name} fetches the ball`;
+    }
+}
+
+// Usage
+const dog1 = new Dog('Max', 'Golden Retriever');
+const dog2 = new Dog('Bella', 'Labrador');
+
+console.log(dog1.speak());           // "Max barks!"
+console.log(dog1.fetch());           // "Max fetches the ball"
+console.log(dog1.info);              // "Max is a Dog"
+console.log(Animal.compare(dog1, dog2)); // -1 (Max comes before Bella)</code>
+            </div>
+
+            <h2>🔗 5. Object.create()</h2>
+            <p>Tạo object với prototype cụ thể:</p>
+            <div class="code-block">
+                <code>// Create object với prototype
+const personPrototype = {
+    greet() {
+        return `Hello, I'm ${this.name}`;
+    },
+    
+    introduce() {
+        return `My name is ${this.name} and I'm ${this.age} years old`;
+    }
+};
+
+// Create object với personPrototype
+const john = Object.create(personPrototype);
+john.name = 'John';
+john.age = 30;
+
+console.log(john.greet());      // "Hello, I'm John"
+console.log(john.introduce());  // "My name is John and I'm 30 years old"
+
+// Object.create với property descriptors
+const jane = Object.create(personPrototype, {
+    name: {
+        value: 'Jane',
+        writable: true,
+        enumerable: true,
+        configurable: true
+    },
+    age: {
+        value: 25,
+        writable: true,
+        enumerable: true,
+        configurable: true
+    },
+    id: {
+        value: 123,
+        writable: false,  // Read-only
+        enumerable: false, // Hidden from Object.keys()
+        configurable: false
+    }
+});
+
+console.log(jane.greet());      // "Hello, I'm Jane"
+console.log(Object.keys(jane)); // ['name', 'age'] - 'id' is not enumerable
+
+// Create object without prototype (null prototype)
+const pureObject = Object.create(null);
+pureObject.name = 'Pure';
+console.log(pureObject.toString); // undefined - no inherited methods</code>
+            </div>
+
+            <h2>📋 6. Object.assign() và Spread Operator</h2>
+            <div class="code-block">
+                <code>// Base object
+const baseUser = {
+    type: 'user',
+    active: true,
+    
+    activate() {
+        this.active = true;
+        return this;
+    },
+    
+    deactivate() {
+        this.active = false;
+        return this;
+    }
+};
+
+// Create new objects using Object.assign()
+const adminUser = Object.assign({}, baseUser, {
+    type: 'admin',
+    permissions: ['read', 'write', 'delete']
+});
+
+const guestUser = Object.assign({}, baseUser, {
+    type: 'guest',
+    permissions: ['read']
+});
+
+// Using spread operator (ES2018)
+const moderatorUser = {
+    ...baseUser,
+    type: 'moderator',
+    permissions: ['read', 'write'],
+    
+    // Override method
+    activate() {
+        console.log('Moderator activated');
+        return baseUser.activate.call(this);
+    }
+};
+
+console.log(adminUser.type);        // 'admin'
+console.log(guestUser.permissions); // ['read']
+console.log(moderatorUser.activate()); // Logs and returns moderator object</code>
+            </div>
+
+            <h2>🏭 7. Module Pattern</h2>
+            <div class="code-block">
+                <code>// IIFE Module Pattern
+const UserModule = (function() {
+    // Private variables
+    let users = [];
+    let nextId = 1;
+    
+    // Private functions
+    function generateId() {
+        return nextId++;
+    }
+    
+    function validateUser(user) {
+        return user.name && user.email;
+    }
+    
+    // Public API
+    return {
+        create(name, email) {
+            const user = {
+                id: generateId(),
+                name,
+                email,
+                createdAt: new Date()
+            };
+            
+            if (validateUser(user)) {
+                users.push(user);
+                return { ...user }; // Return copy
+            }
+            
+            throw new Error('Invalid user data');
+        },
+        
+        findById(id) {
+            const user = users.find(u => u.id === id);
+            return user ? { ...user } : null;
+        },
+        
+        getAll() {
+            return users.map(user => ({ ...user }));
+        },
+        
+        delete(id) {
+            const index = users.findIndex(u => u.id === id);
+            if (index > -1) {
+                return users.splice(index, 1)[0];
+            }
+            return null;
+        }
+    };
+})();
+
+// Usage
+const user1 = UserModule.create('John', 'john@example.com');
+const user2 = UserModule.create('Jane', 'jane@example.com');
+
+console.log(UserModule.getAll()); // Array of users
+console.log(UserModule.findById(1)); // John's data</code>
+            </div>
+
+            <h2>🎯 8. Mixin Pattern</h2>
+            <div class="code-block">
+                <code>// Mixin functions
+const Flyable = {
+    fly() {
+        return `${this.name} is flying`;
+    },
+    
+    land() {
+        return `${this.name} has landed`;
+    }
+};
+
+const Swimmable = {
+    swim() {
+        return `${this.name} is swimming`;
+    },
+    
+    dive() {
+        return `${this.name} dives underwater`;
+    }
+};
+
+// Base class
+class Animal {
+    constructor(name) {
+        this.name = name;
+    }
+}
+
+// Mixin helper function
+function mixin(target, ...sources) {
+    sources.forEach(source => {
+        Object.getOwnPropertyNames(source).forEach(name => {
+            if (name !== 'constructor') {
+                target.prototype[name] = source[name];
+            }
+        });
+    });
+    return target;
+}
+
+// Create classes with mixins
+class Bird extends Animal {
+    constructor(name, species) {
+        super(name);
+        this.species = species;
+    }
+}
+
+class Duck extends Animal {
+    constructor(name) {
+        super(name);
+    }
+}
+
+// Apply mixins
+mixin(Bird, Flyable);
+mixin(Duck, Flyable, Swimmable);
+
+// Usage
+const eagle = new Bird('Eagle', 'Bald Eagle');
+const duck = new Duck('Donald');
+
+console.log(eagle.fly());  // "Eagle is flying"
+console.log(duck.swim());  // "Donald is swimming"
+console.log(duck.fly());   // "Donald is flying"</code>
+            </div>
+
+            <h2>⚡ Performance Comparison</h2>
+            <div class="code-block">
+                <code>// Performance test function
+function performanceTest(name, createFunction, iterations = 100000) {
+    const start = performance.now();
+    
+    for (let i = 0; i < iterations; i++) {
+        createFunction();
+    }
+    
+    const end = performance.now();
+    console.log(`${name}: ${end - start}ms`);
+}
+
+// Test different creation methods
+performanceTest('Object Literal', () => ({
+    name: 'Test',
+    age: 30,
+    greet() { return 'Hello'; }
+}));
+
+performanceTest('Factory Function', () => createPerson('Test', 30, 'City'));
+
+performanceTest('Constructor Function', () => new Person('Test', 30, 'City'));
+
+performanceTest('Class', () => new Animal('Test', 'Human'));
+
+performanceTest('Object.create', () => {
+    const obj = Object.create(personPrototype);
+    obj.name = 'Test';
+    obj.age = 30;
+    return obj;
+});
+
+// Results vary by JavaScript engine, but generally:
+// Object literals: Fastest
+// Constructor functions/Classes: Fast
+// Factory functions: Slower (creates new methods each time)
+// Object.create: Moderate</code>
+            </div>
+
+            <h2>💡 Khi nào sử dụng pattern nào?</h2>
+
+            <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                <thead>
+                    <tr style="background: var(--bg-light);">
+                        <th style="padding: 0.5rem; border: 1px solid #ddd;">Pattern</th>
+                        <th style="padding: 0.5rem; border: 1px solid #ddd;">Khi sử dụng</th>
+                        <th style="padding: 0.5rem; border: 1px solid #ddd;">Ưu điểm</th>
+                        <th style="padding: 0.5rem; border: 1px solid #ddd;">Nhược điểm</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;"><strong>Object Literals</strong></td>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;">Single objects, simple data</td>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;">Fast, simple</td>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;">No reusability</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;"><strong>Factory Functions</strong></td>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;">Privacy, flexibility</td>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;">Private vars, no 'new'</td>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;">Memory usage</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;"><strong>Constructor Functions</strong></td>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;">Traditional OOP, performance</td>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;">Prototype sharing</td>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;">Must use 'new'</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;"><strong>Classes</strong></td>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;">Modern OOP, inheritance</td>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;">Clean syntax</td>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;">Less flexibility</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;"><strong>Object.create</strong></td>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;">Precise prototype control</td>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;">Flexible prototypes</td>
+                        <td style="padding: 0.5rem; border: 1px solid #ddd;">Verbose</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>🎓 Tổng kết</h2>
+            <p>
+                JavaScript cung cấp nhiều cách để tạo objects, mỗi cách phù hợp cho different use cases:
+            </p>
+            <ul>
+                <li><strong>Object literals:</strong> Cho single objects và simple data structures</li>
+                <li><strong>Factory functions:</strong> Khi cần privacy và flexibility</li>
+                <li><strong>Constructor functions:</strong> Traditional OOP với prototype sharing</li>
+                <li><strong>Classes:</strong> Modern OOP syntax với inheritance</li>
+                <li><strong>Object.create():</strong> Precise prototype control</li>
+                <li><strong>Mixins:</strong> Composition over inheritance</li>
+            </ul>
+
+            <h2>🔗 Bài viết liên quan</h2>
+            <ul>
+                <li><a href="js-object-config.html">Object Configuration</a></li>
+                <li><a href="js-methods.html">Methods trong JavaScript</a></li>
+                <li><a href="../blog.html">Xem tất cả bài viết</a></li>
+            </ul>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevBlog. Made with ❤️ for the programming community.</p>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

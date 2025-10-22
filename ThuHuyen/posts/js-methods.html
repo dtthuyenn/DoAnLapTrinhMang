@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methods trong JavaScript - DevBlog</title>
+    <meta name="description" content="Hướng dẫn toàn diện về methods trong JavaScript: functions, arrow functions, this keyword và method binding.">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DevBlog</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../blog.html" class="nav-link">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Article Content -->
+    <article class="article">
+        <a href="../blog.html" class="back-btn">← Quay lại Blog</a>
+        
+        <header class="article-header">
+            <h1 class="article-title">Methods trong JavaScript</h1>
+            <div class="article-meta">
+                <span class="blog-category">JavaScript</span> • 
+                Đăng ngày 29/09/2024 • 
+                9 phút đọc
+            </div>
+        </header>
+
+        <div class="article-content">
+            <h2>📖 Methods là gì?</h2>
+            <p>
+                Methods trong JavaScript là functions được lưu trữ như properties của objects. 
+                Chúng cho phép objects có behavior và tương tác với data của mình. 
+                Hiểu rõ về methods và <span class="inline-code">this</span> keyword là chìa khóa để master JavaScript OOP.
+            </p>
+
+            <h2>🎯 Cách định nghĩa Methods</h2>
+
+            <h3>1. Method Definition trong Object Literals</h3>
+            <div class="code-block">
+                <code>// Traditional function syntax
+const calculator = {
+    value: 0,
+    
+    // Method using function keyword
+    add: function(num) {
+        this.value += num;
+        return this;
+    },
+    
+    // Shorthand method syntax (ES6)
+    subtract(num) {
+        this.value -= num;
+        return this;
+    },
+    
+    // Arrow function (careful with 'this')
+    multiply: (num) => {
+        // 'this' refers to global object, not calculator!
+        console.log(this); // Window object in browser
+    },
+    
+    // Getter
+    get result() {
+        return this.value;
+    },
+    
+    // Setter
+    set result(newValue) {
+        this.value = newValue;
+    }
+};
+
+// Usage
+calculator.add(10).subtract(3);
+console.log(calculator.result); // 7
+
+calculator.result = 20;
+console.log(calculator.result); // 20</code>
+            </div>
+
+            <h3>2. Adding Methods sau khi Object được tạo</h3>
+            <div class="code-block">
+                <code>let person = {
+    name: 'John',
+    age: 30
+};
+
+// Add method directly
+person.greet = function() {
+    return `Hello, I'm ${this.name}`;
+};
+
+// Add method using Object.defineProperty
+Object.defineProperty(person, 'celebrate', {
+    value: function() {
+        this.age++;
+        return `Happy birthday! Now I'm ${this.age}`;
+    },
+    writable: true,
+    enumerable: true,
+    configurable: true
+});
+
+// Add multiple methods
+Object.assign(person, {
+    introduce() {
+        return `I'm ${this.name}, ${this.age} years old`;
+    },
+    
+    sayGoodbye() {
+        return 'Goodbye!';
+    }
+});
+
+console.log(person.greet());      // "Hello, I'm John"
+console.log(person.celebrate());  // "Happy birthday! Now I'm 31"
+console.log(person.introduce());  // "I'm John, 31 years old"</code>
+            </div>
+
+            <h2>🔍 The 'this' Keyword</h2>
+
+            <h3>This Context trong Methods</h3>
+            <div class="code-block">
+                <code>const user = {
+    name: 'Alice',
+    age: 25,
+    
+    // Regular method - 'this' refers to user object
+    regularMethod() {
+        console.log('Regular method this:', this.name); // 'Alice'
+        
+        // Nested function loses 'this' context
+        function nestedFunction() {
+            console.log('Nested function this:', this.name); // undefined
+        }
+        nestedFunction();
+        
+        // Arrow function in nested maintains 'this'
+        const arrowFunction = () => {
+            console.log('Arrow function this:', this.name); // 'Alice'
+        };
+        arrowFunction();
+    },
+    
+    // Arrow function method - 'this' is lexically bound
+    arrowMethod: () => {
+        console.log('Arrow method this:', this.name); // undefined
+    }
+};
+
+user.regularMethod();
+user.arrowMethod();</code>
+            </div>
+
+            <h3>Method Borrowing và This Binding</h3>
+            <div class="code-block">
+                <code>const person1 = {
+    name: 'John',
+    greet() {
+        return `Hello, I'm ${this.name}`;
+    }
+};
+
+const person2 = {
+    name: 'Jane'
+};
+
+// Method borrowing
+const greetMethod = person1.greet;
+console.log(greetMethod()); // "Hello, I'm undefined" - lost context
+
+// Explicit binding với call()
+console.log(person1.greet.call(person2)); // "Hello, I'm Jane"
+
+// Explicit binding với apply()
+console.log(person1.greet.apply(person2)); // "Hello, I'm Jane"
+
+// Permanent binding với bind()
+const boundGreet = person1.greet.bind(person2);
+console.log(boundGreet()); // "Hello, I'm Jane"
+
+// Method với parameters
+const calculator = {
+    multiply(a, b) {
+        return a * b;
+    }
+};
+
+const mathObj = { name: 'Math Operations' };
+
+// Using call with parameters
+console.log(calculator.multiply.call(mathObj, 5, 3)); // 15
+
+// Using apply with parameters array
+console.log(calculator.multiply.apply(mathObj, [5, 3])); // 15
+
+// Using bind with parameters
+const boundMultiply = calculator.multiply.bind(mathObj, 5);
+console.log(boundMultiply(3)); // 15 (partial application)</code>
+            </div>
+
+            <h2>🏗️ Class Methods</h2>
+            <div class="code-block">
+                <code>class Vehicle {
+    constructor(brand, model) {
+        this.brand = brand;
+        this.model = model;
+        this.speed = 0;
+    }
+    
+    // Instance method
+    accelerate(amount) {
+        this.speed += amount;
+        return this;
+    }
+    
+    // Instance method
+    brake(amount) {
+        this.speed = Math.max(0, this.speed - amount);
+        return this;
+    }
+    
+    // Getter method
+    get info() {
+        return `${this.brand} ${this.model} - Speed: ${this.speed}km/h`;
+    }
+    
+    // Setter method
+    set maxSpeed(speed) {
+        if (speed > this.speed) {
+            this.speed = speed;
+        }
+    }
+    
+    // Static method - belongs to class, not instance
+    static compare(vehicle1, vehicle2) {
+        return vehicle1.speed - vehicle2.speed;
+    }
+    
+    // Private method (ES2022)
+    #calculateFuelConsumption() {
+        return this.speed * 0.1;
+    }
+    
+    // Public method using private method
+    getFuelConsumption() {
+        return this.#calculateFuelConsumption();
+    }
+}
+
+// Usage
+const car = new Vehicle('Toyota', 'Camry');
+car.accelerate(50).brake(10);
+console.log(car.info); // "Toyota Camry - Speed: 40km/h"
+
+const truck = new Vehicle('Ford', 'F-150');
+truck.accelerate(30);
+
+console.log(Vehicle.compare(car, truck)); // 10 (40 - 30)</code>
+            </div>
+
+            <h2>🔄 Method Chaining</h2>
+            <div class="code-block">
+                <code>class FluentCalculator {
+    constructor(initialValue = 0) {
+        this.value = initialValue;
+    }
+    
+    add(num) {
+        this.value += num;
+        return this; // Return 'this' for chaining
+    }
+    
+    subtract(num) {
+        this.value -= num;
+        return this;
+    }
+    
+    multiply(num) {
+        this.value *= num;
+        return this;
+    }
+    
+    divide(num) {
+        if (num !== 0) {
+            this.value /= num;
+        }
+        return this;
+    }
+    
+    power(exponent) {
+        this.value = Math.pow(this.value, exponent);
+        return this;
+    }
+    
+    // Terminal method - doesn't return 'this'
+    result() {
+        return this.value;
+    }
+    
+    // Reset và return this for continued chaining
+    reset(value = 0) {
+        this.value = value;
+        return this;
+    }
+}
+
+// Method chaining example
+const calc = new FluentCalculator(10)
+    .add(5)        // 15
+    .multiply(2)   // 30
+    .subtract(10)  // 20
+    .divide(4)     // 5
+    .power(2);     // 25
+
+console.log(calc.result()); // 25
+
+// Continue chaining after reset
+calc.reset(100).add(50).multiply(0.5);
+console.log(calc.result()); // 75</code>
+            </div>
+
+            <h2>🚀 Advanced Method Patterns</h2>
+
+            <h3>1. Memoization trong Methods</h3>
+            <div class="code-block">
+                <code>class Calculator {
+    constructor() {
+        this.cache = new Map();
+    }
+    
+    // Expensive computation với memoization
+    fibonacci(n) {
+        const key = `fib_${n}`;
+        
+        if (this.cache.has(key)) {
+            console.log('Cache hit for', n);
+            return this.cache.get(key);
+        }
+        
+        let result;
+        if (n <= 1) {
+            result = n;
+        } else {
+            result = this.fibonacci(n - 1) + this.fibonacci(n - 2);
+        }
+        
+        this.cache.set(key, result);
+        return result;
+    }
+    
+    // Clear cache method
+    clearCache() {
+        this.cache.clear();
+        return this;
+    }
+}
+
+const calc = new Calculator();
+console.log(calc.fibonacci(10)); // Computed
+console.log(calc.fibonacci(10)); // Cache hit</code>
+            </div>
+
+            <h3>2. Decorator Pattern cho Methods</h3>
+            <div class="code-block">
+                <code>// Method decorator function
+function logMethodCalls(target, methodName, descriptor) {
+    const originalMethod = descriptor.value;
+    
+    descriptor.value = function(...args) {
+        console.log(`Calling ${methodName} with args:`, args);
+        const result = originalMethod.apply(this, args);
+        console.log(`${methodName} returned:`, result);
+        return result;
+    };
+    
+    return descriptor;
+}
+
+// Timer decorator
+function timeMethod(target, methodName, descriptor) {
+    const originalMethod = descriptor.value;
+    
+    descriptor.value = function(...args) {
+        const start = performance.now();
+        const result = originalMethod.apply(this, args);
+        const end = performance.now();
+        console.log(`${methodName} took ${end - start} milliseconds`);
+        return result;
+    };
+    
+    return descriptor;
+}
+
+class DataProcessor {
+    @logMethodCalls
+    @timeMethod
+    processData(data) {
+        // Simulate processing
+        return data.map(x => x * 2);
+    }
+}
+
+// Note: Decorators cần babel plugin hoặc TypeScript
+// Thay thế bằng manual decoration:
+const processor = new DataProcessor();
+const originalProcess = processor.processData;
+processor.processData = timeMethod(processor, 'processData', {
+    value: logMethodCalls(processor, 'processData', {
+        value: originalProcess
+    }).value
+}).value;</code>
+            </div>
+
+            <h3>3. Async Methods</h3>
+            <div class="code-block">
+                <code>class ApiClient {
+    constructor(baseURL) {
+        this.baseURL = baseURL;
+        this.headers = {
+            'Content-Type': 'application/json'
+        };
+    }
+    
+    // Async method
+    async get(endpoint) {
+        try {
+            const response = await fetch(`${this.baseURL}${endpoint}`, {
+                headers: this.headers
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('GET request failed:', error);
+            throw error;
+        }
+    }
+    
+    async post(endpoint, data) {
+        try {
+            const response = await fetch(`${this.baseURL}${endpoint}`, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify(data)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('POST request failed:', error);
+            throw error;
+        }
+    }
+    
+    // Method chaining với async
+    setAuth(token) {
+        this.headers['Authorization'] = `Bearer ${token}`;
+        return this; // Return this for chaining
+    }
+    
+    setTimeout(ms) {
+        this.timeout = ms;
+        return this;
+    }
+}
+
+// Usage
+const api = new ApiClient('https://api.example.com');
+
+// Async method usage
+async function fetchUserData() {
+    try {
+        const user = await api
+            .setAuth('your-token')
+            .setTimeout(5000)
+            .get('/users/123');
+            
+        console.log('User data:', user);
+    } catch (error) {
+        console.error('Failed to fetch user:', error);
+    }
+}</code>
+            </div>
+
+            <h2>💡 Method Best Practices</h2>
+
+            <h3>1. Method Naming Conventions</h3>
+            <div class="code-block">
+                <code>class UserService {
+    // Action methods - verbs
+    createUser(userData) { /* ... */ }
+    updateUser(id, updates) { /* ... */ }
+    deleteUser(id) { /* ... */ }
+    
+    // Query methods - questions
+    isUserActive(user) { /* ... */ }
+    hasPermission(user, permission) { /* ... */ }
+    canEditProfile(user) { /* ... */ }
+    
+    // Getter methods
+    getUserById(id) { /* ... */ }
+    getAllUsers() { /* ... */ }
+    getActiveUsers() { /* ... */ }
+    
+    // Calculation methods
+    calculateUserScore(user) { /* ... */ }
+    computeUserAge(birthDate) { /* ... */ }
+    
+    // Validation methods
+    validateEmail(email) { /* ... */ }
+    validatePassword(password) { /* ... */ }
+}</code>
+            </div>
+
+            <h3>2. Error Handling trong Methods</h3>
+            <div class="code-block">
+                <code>class BankAccount {
+    constructor(initialBalance = 0) {
+        this.balance = initialBalance;
+        this.transactions = [];
+    }
+    
+    deposit(amount) {
+        if (amount <= 0) {
+            throw new Error('Deposit amount must be positive');
+        }
+        
+        this.balance += amount;
+        this.transactions.push({
+            type: 'deposit',
+            amount,
+            timestamp: new Date(),
+            balance: this.balance
+        });
+        
+        return this;
+    }
+    
+    withdraw(amount) {
+        if (amount <= 0) {
+            throw new Error('Withdrawal amount must be positive');
+        }
+        
+        if (amount > this.balance) {
+            throw new Error('Insufficient funds');
+        }
+        
+        this.balance -= amount;
+        this.transactions.push({
+            type: 'withdrawal',
+            amount,
+            timestamp: new Date(),
+            balance: this.balance
+        });
+        
+        return this;
+    }
+    
+    // Safe method với try-catch
+    safeWithdraw(amount) {
+        try {
+            this.withdraw(amount);
+            return { success: true, balance: this.balance };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+}</code>
+            </div>
+
+            <h2>🎓 Tổng kết</h2>
+            <p>
+                Methods là core của JavaScript OOP programming. Key points cần nhớ:
+            </p>
+            <ul>
+                <li><strong>This binding:</strong> Regular functions vs arrow functions</li>
+                <li><strong>Method definition:</strong> Object literals, classes, dynamic addition</li>
+                <li><strong>Call/Apply/Bind:</strong> Explicit this binding</li>
+                <li><strong>Method chaining:</strong> Return this for fluent interfaces</li>
+                <li><strong>Async methods:</strong> Promise-based operations</li>
+                <li><strong>Best practices:</strong> Naming, error handling, performance</li>
+            </ul>
+
+            <h2>🔗 Bài viết liên quan</h2>
+            <ul>
+                <li><a href="js-references.html">References trong JavaScript</a></li>
+                <li><a href="js-object-config.html">Object Configuration</a></li>
+                <li><a href="../blog.html">Xem tất cả bài viết</a></li>
+            </ul>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevBlog. Made with ❤️ for the programming community.</p>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

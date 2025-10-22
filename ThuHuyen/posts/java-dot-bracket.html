@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dot vs Bracket Notation trong Java - DevBlog</title>
+    <meta name="description" content="So sánh và phân biệt giữa dot notation và bracket notation trong Java khi truy cập properties và methods.">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DevBlog</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../blog.html" class="nav-link">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Article Content -->
+    <article class="article">
+        <a href="../blog.html" class="back-btn">← Quay lại Blog</a>
+        
+        <header class="article-header">
+            <h1 class="article-title">Dot vs Bracket Notation trong Java</h1>
+            <div class="article-meta">
+                <span class="blog-category">Java</span> • 
+                Đăng ngày 29/09/2024 • 
+                5 phút đọc
+            </div>
+        </header>
+
+        <div class="article-content">
+            <h2>📖 Giới thiệu</h2>
+            <p>
+                Trong Java, việc truy cập members (fields, methods) của objects chủ yếu sử dụng dot notation. 
+                Tuy nhiên, cũng có một số trường hợp sử dụng bracket notation, đặc biệt khi làm việc với arrays, 
+                collections và reflection.
+            </p>
+
+            <h2>🎯 Dot Notation (.)</h2>
+            <p>Dot notation là cách thông thường nhất để truy cập members trong Java:</p>
+
+            <h3>Truy cập Fields và Methods</h3>
+            <div class="code-block">
+                <code>public class Student {
+    public String name;
+    private int age;
+    
+    public int getAge() {
+        return age;
+    }
+    
+    public void setAge(int age) {
+        this.age = age;
+    }
+    
+    public void study() {
+        System.out.println(name + " is studying");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Student student = new Student();
+        
+        // Dot notation for fields
+        student.name = "John";
+        
+        // Dot notation for methods
+        student.setAge(20);
+        int age = student.getAge();
+        student.study();
+        
+        // Chaining methods
+        String result = student.name.toUpperCase().substring(0, 2);
+    }
+}</code>
+            </div>
+
+            <h3>Static Members</h3>
+            <div class="code-block">
+                <code>public class MathUtils {
+    public static final double PI = 3.14159;
+    public static int counter = 0;
+    
+    public static double calculateArea(double radius) {
+        return PI * radius * radius;
+    }
+    
+    public static void incrementCounter() {
+        counter++;
+    }
+}
+
+// Truy cập static members với dot notation
+double area = MathUtils.calculateArea(5.0);
+double pi = MathUtils.PI;
+MathUtils.incrementCounter();
+int count = MathUtils.counter;</code>
+            </div>
+
+            <h2>🔲 Bracket Notation ([])</h2>
+            <p>Bracket notation trong Java chủ yếu được sử dụng cho arrays và indexing:</p>
+
+            <h3>1. Arrays</h3>
+            <div class="code-block">
+                <code>// Array declaration và initialization
+int[] numbers = {1, 2, 3, 4, 5};
+String[] names = new String[3];
+
+// Truy cập elements với bracket notation
+int firstNumber = numbers[0];    // 1
+int lastNumber = numbers[4];     // 5
+
+names[0] = "Alice";
+names[1] = "Bob";
+names[2] = "Charlie";
+
+// Lặp qua array
+for (int i = 0; i < numbers.length; i++) {
+    System.out.println("Index " + i + ": " + numbers[i]);
+}
+
+// Enhanced for loop (không cần bracket notation)
+for (String name : names) {
+    System.out.println(name);
+}</code>
+            </div>
+
+            <h3>2. Multidimensional Arrays</h3>
+            <div class="code-block">
+                <code>// 2D array
+int[][] matrix = {
+    {1, 2, 3},
+    {4, 5, 6},
+    {7, 8, 9}
+};
+
+// Truy cập elements
+int element = matrix[1][2]; // 6 (row 1, column 2)
+matrix[0][0] = 10;          // Modify first element
+
+// 3D array
+int[][][] cube = new int[3][3][3];
+cube[1][2][0] = 42;
+int value = cube[1][2][0];
+
+// Lặp qua 2D array
+for (int i = 0; i < matrix.length; i++) {
+    for (int j = 0; j < matrix[i].length; j++) {
+        System.out.print(matrix[i][j] + " ");
+    }
+    System.out.println();
+}</code>
+            </div>
+
+            <h3>3. Collections và Map</h3>
+            <div class="code-block">
+                <code>import java.util.*;
+
+// List - sử dụng methods thay vì bracket notation
+List<String> list = new ArrayList<>();
+list.add("Apple");       // Không phải list[0] = "Apple"
+list.add("Banana");
+String fruit = list.get(1); // "Banana" - không phải list[1]
+
+// Map - tương tự như bracket notation trong một số ngôn ngữ khác
+Map<String, Integer> map = new HashMap<>();
+map.put("apple", 5);     // Không phải map["apple"] = 5
+map.put("banana", 3);
+int apples = map.get("apple"); // Không phải map["apple"]
+
+// Array-like access với ArrayList
+ArrayList<String> arrayList = new ArrayList<>();
+arrayList.add("First");
+arrayList.add("Second");
+// arrayList[0] KHÔNG hợp lệ - phải dùng get(0)</code>
+            </div>
+
+            <h2>🔍 So sánh Dot vs Bracket</h2>
+            
+            <h3>Java vs JavaScript</h3>
+            <div class="code-block">
+                <code>// JavaScript (cho so sánh)
+/*
+var obj = {name: "John", age: 25};
+obj.name;        // Dot notation
+obj["name"];     // Bracket notation
+obj["a" + "ge"]; // Dynamic property access
+*/
+
+// Java
+class Person {
+    public String name;
+    public int age;
+}
+
+Person person = new Person();
+person.name = "John";        // Chỉ có dot notation
+person.age = 25;
+// person["name"] KHÔNG hợp lệ trong Java
+
+// Để có dynamic property access, cần dùng Reflection</code>
+            </div>
+
+            <h3>Reflection - Dynamic Access</h3>
+            <div class="code-block">
+                <code>import java.lang.reflect.Field;
+
+public class ReflectionExample {
+    public static void main(String[] args) throws Exception {
+        Person person = new Person();
+        Class<?> clazz = person.getClass();
+        
+        // Dynamic field access (tương tự bracket notation)
+        Field nameField = clazz.getField("name");
+        nameField.set(person, "John");
+        String name = (String) nameField.get(person);
+        
+        // Với field name từ string
+        String fieldName = "age";
+        Field ageField = clazz.getField(fieldName);
+        ageField.set(person, 25);
+        int age = (int) ageField.get(person);
+        
+        System.out.println("Name: " + name + ", Age: " + age);
+    }
+}</code>
+            </div>
+
+            <h2>🎯 Khi nào sử dụng gì?</h2>
+
+            <h3>Dot Notation - Sử dụng khi:</h3>
+            <ul>
+                <li>✅ Truy cập fields và methods của objects</li>
+                <li>✅ Truy cập static members</li>
+                <li>✅ Method chaining</li>
+                <li>✅ Truy cập nested objects</li>
+            </ul>
+
+            <div class="code-block">
+                <code>// Examples của dot notation
+student.getName().toUpperCase().length();
+Math.PI;
+System.out.println();
+LocalDate.now().plusDays(1).format(formatter);</code>
+            </div>
+
+            <h3>Bracket Notation - Sử dụng khi:</h3>
+            <ul>
+                <li>✅ Truy cập array elements</li>
+                <li>✅ Multidimensional arrays</li>
+                <li>✅ Generic type parameters (một số trường hợp)</li>
+            </ul>
+
+            <div class="code-block">
+                <code>// Examples của bracket notation
+int[] arr = {1, 2, 3};
+int first = arr[0];
+
+String[][] table = new String[5][10];
+table[2][3] = "Hello";
+
+// Generic với wildcards
+List<? extends Number> list;
+// Class<?> clazz;</code>
+            </div>
+
+            <h2>⚠️ Common Mistakes</h2>
+            <div class="code-block">
+                <code>// ❌ WRONG - Java không support bracket notation cho objects
+// person["name"] = "John";  // Compile error
+// int age = person["age"];  // Compile error
+
+// ✅ CORRECT - Sử dụng dot notation
+person.name = "John";
+int age = person.getAge();
+
+// ❌ WRONG - Confusing với JavaScript
+// list["length"]  // Compile error
+
+// ✅ CORRECT - Sử dụng methods
+int size = list.size();
+int length = array.length;  // length là field của array
+
+// ❌ WRONG - Array access với dot
+// int value = array.0;  // Compile error
+
+// ✅ CORRECT - Array access với brackets
+int value = array[0];</code>
+            </div>
+
+            <h2>🔧 Advanced Patterns</h2>
+
+            <h3>Map như Bracket Notation</h3>
+            <div class="code-block">
+                <code>// Tạo utility class để simulate bracket notation
+public class DynamicObject {
+    private Map<String, Object> properties = new HashMap<>();
+    
+    public Object get(String key) {
+        return properties.get(key);
+    }
+    
+    public void set(String key, Object value) {
+        properties.put(key, value);
+    }
+    
+    // Fluent interface
+    public DynamicObject with(String key, Object value) {
+        properties.put(key, value);
+        return this;
+    }
+}
+
+// Usage
+DynamicObject obj = new DynamicObject()
+    .with("name", "John")
+    .with("age", 25);
+
+String name = (String) obj.get("name");
+Integer age = (Integer) obj.get("age");</code>
+            </div>
+
+            <h2>🎓 Tổng kết</h2>
+            <p>
+                Trong Java, dot notation là cách chính để truy cập object members, trong khi bracket notation 
+                chủ yếu dành cho arrays. Hiểu rõ sự khác biệt này giúp bạn viết code Java đúng syntax 
+                và tránh confusion với các ngôn ngữ khác như JavaScript.
+            </p>
+
+            <h2>🔗 Bài viết liên quan</h2>
+            <ul>
+                <li><a href="java-properties.html">Properties trong Java</a></li>
+                <li><a href="java-objects.html">Objects trong Java</a></li>
+                <li><a href="../blog.html">Xem tất cả bài viết</a></li>
+            </ul>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevBlog. Made with ❤️ for the programming community.</p>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

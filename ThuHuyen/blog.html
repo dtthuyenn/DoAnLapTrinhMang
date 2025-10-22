@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - DevBlog Java & JavaScript</title>
+    <meta name="description" content="Tất cả bài viết về lập trình Java và JavaScript. Học hỏi từ cơ bản đến nâng cao với các tutorial chi tiết và thực tế.">
+    <meta name="keywords" content="Java blog, JavaScript blog, programming tutorial, lập trình, objects, methods, properties">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DevBlog</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="blog.html" class="nav-link active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="fade-in">Blog về Java & JavaScript</h1>
+            <p class="fade-in">Khám phá kiến thức lập trình từ cơ bản đến nâng cao. Tất cả bài viết được viết dựa trên kinh nghiệm thực tế và best practices trong ngành.</p>
+            
+            <!-- Search Box -->
+            <div class="fade-in" style="margin-top: 2rem;">
+                <input type="text" id="search-input" placeholder="🔍 Tìm kiếm bài viết..." 
+                       style="padding: 1rem 1.5rem; font-size: 1rem; border: none; border-radius: 50px; 
+                              width: 100%; max-width: 400px; box-shadow: var(--shadow-medium);
+                              outline: none; background: var(--bg-white);">
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Posts Section -->
+    <section class="py-4">
+        <div class="container">
+            <div class="blog-grid">
+                <!-- Java Posts -->
+                <div class="blog-card fade-in hover-scale">
+                    <div class="blog-thumbnail" style="background: linear-gradient(135deg, #f59e0b, #d97706);">☕</div>
+                    <div class="blog-content">
+                        <span class="blog-category">Java</span>
+                        <h3 class="blog-title">Hiểu về Objects trong Java</h3>
+                        <p class="blog-description">
+                            Khám phá khái niệm cơ bản nhất trong Java - Objects. Tìm hiểu cách tạo, sử dụng và quản lý objects một cách hiệu quả trong các dự án thực tế.
+                        </p>
+                        <a href="posts/java-objects.html" class="read-more-btn">
+                            Đọc thêm →
+                        </a>
+                    </div>
+                </div>
+
+                <div class="blog-card fade-in hover-scale">
+                    <div class="blog-thumbnail" style="background: linear-gradient(135deg, #f59e0b, #d97706);">📝</div>
+                    <div class="blog-content">
+                        <span class="blog-category">Java</span>
+                        <h3 class="blog-title">Literals trong Java</h3>
+                        <p class="blog-description">
+                            Tìm hiểu về các loại literals trong Java: string literals, numeric literals, boolean literals và cách sử dụng chúng đúng cách.
+                        </p>
+                        <a href="posts/java-literals.html" class="read-more-btn">
+                            Đọc thêm →
+                        </a>
+                    </div>
+                </div>
+
+                <div class="blog-card fade-in hover-scale">
+                    <div class="blog-thumbnail" style="background: linear-gradient(135deg, #f59e0b, #d97706);">🏠</div>
+                    <div class="blog-content">
+                        <span class="blog-category">Java</span>
+                        <h3 class="blog-title">Properties trong Java</h3>
+                        <p class="blog-description">
+                            Hướng dẫn chi tiết về properties trong Java: getter, setter, access modifiers và best practices khi làm việc với object properties.
+                        </p>
+                        <a href="posts/java-properties.html" class="read-more-btn">
+                            Đọc thêm →
+                        </a>
+                    </div>
+                </div>
+
+                <div class="blog-card fade-in hover-scale">
+                    <div class="blog-thumbnail" style="background: linear-gradient(135deg, #f59e0b, #d97706);">🔍</div>
+                    <div class="blog-content">
+                        <span class="blog-category">Java</span>
+                        <h3 class="blog-title">Dot vs Bracket Notation</h3>
+                        <p class="blog-description">
+                            So sánh giữa dot notation và bracket notation trong Java. Khi nào sử dụng cách nào và tại sao chúng quan trọng trong việc truy cập properties.
+                        </p>
+                        <a href="posts/java-dot-bracket.html" class="read-more-btn">
+                            Đọc thêm →
+                        </a>
+                    </div>
+                </div>
+
+                <div class="blog-card fade-in hover-scale">
+                    <div class="blog-thumbnail" style="background: linear-gradient(135deg, #f59e0b, #d97706);">✅</div>
+                    <div class="blog-content">
+                        <span class="blog-category">Java</span>
+                        <h3 class="blog-title">Property Existence Test</h3>
+                        <p class="blog-description">
+                            Học cách kiểm tra sự tồn tại của properties trong Java objects. Sử dụng reflection, annotations và các téchniques khác nhau.
+                        </p>
+                        <a href="posts/java-property-test.html" class="read-more-btn">
+                            Đọc thêm →
+                        </a>
+                    </div>
+                </div>
+
+                <!-- JavaScript Posts -->
+                <div class="blog-card fade-in hover-scale">
+                    <div class="blog-thumbnail" style="background: linear-gradient(135deg, #eab308, #ca8a04);">🔗</div>
+                    <div class="blog-content">
+                        <span class="blog-category">JavaScript</span>
+                        <h3 class="blog-title">References trong JavaScript</h3>
+                        <p class="blog-description">
+                            Hiểu sâu về cách JavaScript xử lý references, pass by value vs pass by reference, và impact đến memory management trong ứng dụng.
+                        </p>
+                        <a href="posts/js-references.html" class="read-more-btn">
+                            Đọc thêm →
+                        </a>
+                    </div>
+                </div>
+
+                <div class="blog-card fade-in hover-scale">
+                    <div class="blog-thumbnail" style="background: linear-gradient(135deg, #eab308, #ca8a04);">🎯</div>
+                    <div class="blog-content">
+                        <span class="blog-category">JavaScript</span>
+                        <h3 class="blog-title">Methods trong JavaScript</h3>
+                        <p class="blog-description">
+                            Hướng dẫn toàn diện về methods trong JavaScript: function declarations, expressions, arrow functions, this keyword và method binding.
+                        </p>
+                        <a href="posts/js-methods.html" class="read-more-btn">
+                            Đọc thêm →
+                        </a>
+                    </div>
+                </div>
+
+                <div class="blog-card fade-in hover-scale">
+                    <div class="blog-thumbnail" style="background: linear-gradient(135deg, #eab308, #ca8a04);">⚙️</div>
+                    <div class="blog-content">
+                        <span class="blog-category">JavaScript</span>
+                        <h3 class="blog-title">Object Configuration</h3>
+                        <p class="blog-description">
+                            Khám phá các cách configure objects trong JavaScript: property descriptors, getters/setters, Object.defineProperty và advanced patterns.
+                        </p>
+                        <a href="posts/js-object-config.html" class="read-more-btn">
+                            Đọc thêm →
+                        </a>
+                    </div>
+                </div>
+
+                <div class="blog-card fade-in hover-scale">
+                    <div class="blog-thumbnail" style="background: linear-gradient(135deg, #eab308, #ca8a04);">🏭</div>
+                    <div class="blog-content">
+                        <span class="blog-category">JavaScript</span>
+                        <h3 class="blog-title">Các cách tạo Objects khác</h3>
+                        <p class="blog-description">
+                            Tìm hiểu nhiều cách khác nhau để tạo objects trong JavaScript: constructor functions, factory functions, Object.create, classes và prototypes.
+                        </p>
+                        <a href="posts/js-create-objects.html" class="read-more-btn">
+                            Đọc thêm →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No Results Message (Hidden by default) -->
+            <div id="no-results" style="display: none; text-align: center; padding: 4rem 0;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+                <h3 style="color: var(--text-secondary); margin-bottom: 1rem;">Không tìm thấy bài viết</h3>
+                <p style="color: var(--text-secondary);">Hãy thử với từ khóa khác hoặc xem tất cả bài viết.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="py-4" style="background: var(--bg-white);">
+        <div class="container">
+            <h2 class="text-center mb-4 fade-in" style="font-size: 2rem; color: var(--text-primary);">Chủ đề nổi bật</h2>
+            <div class="blog-grid" style="max-width: 800px; margin: 0 auto;">
+                <div class="blog-card fade-in hover-scale">
+                    <div class="blog-content text-center">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">☕</div>
+                        <h3 class="blog-title">Java Programming</h3>
+                        <p class="blog-description">5 bài viết về Java</p>
+                        <div style="margin-top: 1rem;">
+                            <span class="blog-category">Objects</span>
+                            <span class="blog-category">Properties</span>
+                            <span class="blog-category">Literals</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="blog-card fade-in hover-scale">
+                    <div class="blog-content text-center">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">⚡</div>
+                        <h3 class="blog-title">JavaScript ES6+</h3>
+                        <p class="blog-description">4 bài viết về JavaScript</p>
+                        <div style="margin-top: 1rem;">
+                            <span class="blog-category">Methods</span>
+                            <span class="blog-category">References</span>
+                            <span class="blog-category">Objects</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="py-4">
+        <div class="container text-center">
+            <div class="fade-in" style="max-width: 600px; margin: 0 auto; background: var(--bg-white); padding: 3rem 2rem; border-radius: var(--border-radius); box-shadow: var(--shadow-medium);">
+                <h2 style="font-size: 2rem; margin-bottom: 1rem; color: var(--text-primary);">📬 Đăng ký nhận thông báo</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                    Nhận thông báo khi có bài viết mới về Java và JavaScript
+                </p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                    <input type="email" placeholder="📧 Email của bạn..." 
+                           style="flex: 1; min-width: 250px; padding: 1rem; border: 2px solid #e5e7eb; border-radius: var(--border-radius); outline: none; font-size: 1rem;">
+                    <button class="read-more-btn" style="white-space: nowrap;">Đăng ký</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevBlog. Made with ❤️ for the programming community.</p>
+            <p style="margin-top: 0.5rem; opacity: 0.7;">
+                📚 9 bài viết | 🔥 Cập nhật thường xuyên | 💻 Java & JavaScript
+            </p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Enhanced search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const blogCards = document.querySelectorAll('.blog-card');
+            const noResults = document.getElementById('no-results');
+            
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                let hasResults = false;
+                
+                blogCards.forEach(card => {
+                    const title = card.querySelector('.blog-title').textContent.toLowerCase();
+                    const description = card.querySelector('.blog-description').textContent.toLowerCase();
+                    const category = card.querySelector('.blog-category').textContent.toLowerCase();
+                    
+                    if (title.includes(searchTerm) || description.includes(searchTerm) || category.includes(searchTerm) || searchTerm === '') {
+                        card.style.display = 'block';
+                        card.style.animation = 'fadeInUp 0.5s ease forwards';
+                        hasResults = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                // Show/hide no results message
+                if (hasResults || searchTerm === '') {
+                    noResults.style.display = 'none';
+                } else {
+                    noResults.style.display = 'block';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

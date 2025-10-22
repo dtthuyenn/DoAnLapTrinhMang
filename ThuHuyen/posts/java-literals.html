@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Literals trong Java - DevBlog</title>
+    <meta name="description" content="Tìm hiểu chi tiết về các loại literals trong Java: string, numeric, boolean và character literals.">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DevBlog</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../blog.html" class="nav-link">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Article Content -->
+    <article class="article">
+        <a href="../blog.html" class="back-btn">← Quay lại Blog</a>
+        
+        <header class="article-header">
+            <h1 class="article-title">Literals trong Java</h1>
+            <div class="article-meta">
+                <span class="blog-category">Java</span> • 
+                Đăng ngày 29/09/2024 • 
+                7 phút đọc
+            </div>
+        </header>
+
+        <div class="article-content">
+            <h2>📖 Literal là gì?</h2>
+            <p>
+                Literal trong Java là một giá trị cố định được viết trực tiếp trong source code. 
+                Chúng đại diện cho các giá trị không thay đổi và được compiler xử lý tại compile-time.
+            </p>
+
+            <h2>🔢 Các loại Literals trong Java</h2>
+
+            <h3>1. Integer Literals</h3>
+            <p>Có nhiều cách để biểu diễn integer literals:</p>
+            
+            <div class="code-block">
+                <code>// Decimal (cơ số 10)
+int decimal = 42;
+int largeNumber = 1_000_000; // Underscore để dễ đọc
+
+// Binary (cơ số 2) - bắt đầu với 0b hoặc 0B
+int binary = 0b1010; // = 10 trong decimal
+int binaryLarge = 0B1111_0000; // = 240 trong decimal
+
+// Octal (cơ số 8) - bắt đầu với 0
+int octal = 052; // = 42 trong decimal
+int octalLarge = 0777; // = 511 trong decimal
+
+// Hexadecimal (cơ số 16) - bắt đầu với 0x hoặc 0X
+int hex = 0x2A; // = 42 trong decimal
+int hexLarge = 0xFF; // = 255 trong decimal
+int hexMixed = 0xDEAD_BEEF; // Mixed case và underscore</code>
+            </div>
+
+            <h3>2. Floating-Point Literals</h3>
+            <div class="code-block">
+                <code>// Double literals (mặc định)
+double pi = 3.14159;
+double scientific = 1.23e-4; // Scientific notation: 1.23 × 10^-4
+double negative = -2.5e10;   // -2.5 × 10^10
+
+// Float literals (kết thúc với 'f' hoặc 'F')
+float price = 99.99f;
+float rate = 0.05F;
+float scientific_f = 1.5e6f; // 1.5 × 10^6
+
+// Hexadecimal floating-point
+double hexFloat = 0x1.fffffffffffffP+1023; // Giá trị gần Double.MAX_VALUE</code>
+            </div>
+
+            <h3>3. Boolean Literals</h3>
+            <div class="code-block">
+                <code>// Chỉ có 2 giá trị boolean literals
+boolean isTrue = true;
+boolean isFalse = false;
+
+// Sử dụng trong điều kiện
+if (true) {
+    System.out.println("Always executed");
+}
+
+// Trong expressions
+boolean result = (5 > 3) && true; // true</code>
+            </div>
+
+            <h3>4. Character Literals</h3>
+            <div class="code-block">
+                <code>// Character literals được bao bọc bởi single quotes
+char letter = 'A';
+char digit = '9';
+char symbol = '@';
+
+// Escape sequences
+char tab = '\t';        // Tab
+char newline = '\n';    // New line
+char backslash = '\\';  // Backslash
+char singleQuote = '\''; // Single quote
+char doubleQuote = '\"'; // Double quote
+
+// Unicode escape sequences
+char unicode1 = '\u0041'; // 'A' trong Unicode
+char unicode2 = '\u03B1'; // Greek alpha (α)
+char unicode3 = '\u4E2D'; // Chinese character (中)</code>
+            </div>
+
+            <h3>5. String Literals</h3>
+            <div class="code-block">
+                <code>// String literals được bao bọc bởi double quotes
+String message = "Hello, World!";
+String empty = "";
+String multiWord = "Java Programming Language";
+
+// String với escape sequences
+String path = "C:\\Users\\Documents\\file.txt";
+String quote = "He said, \"Hello!\"";
+String multiLine = "Line 1\nLine 2\nLine 3";
+
+// Raw string literals (Java 15+) - Text blocks
+String json = """
+    {
+        "name": "John Doe",
+        "age": 30,
+        "active": true
+    }
+    """;
+
+// Unicode trong strings
+String greeting = "Xin chào! \u4F60\u597D!"; // Vietnamese + Chinese</code>
+            </div>
+
+            <h3>6. Null Literal</h3>
+            <div class="code-block">
+                <code>// null literal - đại diện cho reference không trỏ đến object nào
+String str = null;
+Object obj = null;
+int[] array = null;
+
+// Kiểm tra null
+if (str == null) {
+    System.out.println("String is null");
+}
+
+// Null pointer exception
+// str.length(); // Throws NullPointerException</code>
+            </div>
+
+            <h2>🎯 Long và các suffix literals</h2>
+            <div class="code-block">
+                <code>// Long literals - kết thúc với 'l' hoặc 'L'
+long smallLong = 42L;
+long largeLong = 9_223_372_036_854_775_807L; // Long.MAX_VALUE
+
+// Nên sử dụng 'L' thay vì 'l' để tránh nhầm lẫn với số 1
+long confusing = 1l;  // Khó đọc
+long clear = 1L;      // Dễ đọc hơn
+
+// Integer literal lớn hơn int range sẽ lỗi compiler
+// int tooLarge = 2147483648; // Compile error
+long correctLong = 2147483648L; // OK</code>
+            </div>
+
+            <h2>🔧 Underscore trong Numeric Literals</h2>
+            <p>Java 7+ cho phép sử dụng underscore để làm cho numeric literals dễ đọc hơn:</p>
+            
+            <div class="code-block">
+                <code>// Các cách sử dụng underscore hợp lệ
+int million = 1_000_000;
+long creditCardNumber = 1234_5678_9012_3456L;
+float pi = 3.14_15F;
+long hexBytes = 0xFF_EC_DE_5E;
+long hexWords = 0xCAFE_BABE;
+long maxLong = 0x7fff_ffff_ffff_ffffL;
+byte nybbles = 0b0010_0001;
+long bytes = 0b11010010_01101001_10010100_10010010;
+
+// Các cách sử dụng KHÔNG hợp lệ
+// int invalid1 = _52;        // Không thể bắt đầu với underscore
+// int invalid2 = 52_;        // Không thể kết thúc với underscore
+// float invalid3 = 52._0;    // Không thể đặt trước decimal point
+// float invalid4 = 52.0_;    // Không thể đặt sau decimal point</code>
+            </div>
+
+            <h2>💡 Type Inference và var keyword</h2>
+            <div class="code-block">
+                <code>// Java 10+ - var keyword với literals
+var number = 42;        // int
+var longNum = 42L;      // long
+var floatNum = 42.0f;   // float
+var doubleNum = 42.0;   // double
+var text = "Hello";     // String
+var flag = true;        // boolean
+var character = 'A';    // char
+
+// Compiler sẽ tự động xác định type dựa trên literal</code>
+            </div>
+
+            <h2>⚠️ Những lưu ý quan trọng</h2>
+
+            <h3>1. Integer Overflow</h3>
+            <div class="code-block">
+                <code>// Integer overflow - không throw exception
+int maxInt = Integer.MAX_VALUE;
+int overflow = maxInt + 1; // Kết quả là Integer.MIN_VALUE
+
+System.out.println(maxInt);     // 2147483647
+System.out.println(overflow);   // -2147483648
+
+// Sử dụng Math.addExact() để detect overflow
+try {
+    int safe = Math.addExact(maxInt, 1);
+} catch (ArithmeticException e) {
+    System.out.println("Overflow detected!");
+}</code>
+            </div>
+
+            <h3>2. Floating Point Precision</h3>
+            <div class="code-block">
+                <code>// Floating point precision issues
+double a = 0.1;
+double b = 0.2;
+double sum = a + b;
+
+System.out.println(sum);        // 0.30000000000000004 (không phải 0.3!)
+System.out.println(sum == 0.3); // false
+
+// Sử dụng BigDecimal cho tính toán chính xác
+BigDecimal bd1 = new BigDecimal("0.1");
+BigDecimal bd2 = new BigDecimal("0.2");
+BigDecimal bdSum = bd1.add(bd2);
+System.out.println(bdSum);      // 0.3</code>
+            </div>
+
+            <h3>3. String Literal Pool</h3>
+            <div class="code-block">
+                <code>// String literals được lưu trong String Pool
+String str1 = "Hello";
+String str2 = "Hello";
+String str3 = new String("Hello");
+
+System.out.println(str1 == str2);  // true - cùng reference trong pool
+System.out.println(str1 == str3);  // false - str3 ở heap
+System.out.println(str1.equals(str3)); // true - cùng content
+
+// Intern method
+String str4 = str3.intern();
+System.out.println(str1 == str4);  // true - str4 được intern vào pool</code>
+            </div>
+
+            <h2>🎨 Best Practices</h2>
+            <ul>
+                <li><strong>Sử dụng underscore:</strong> Làm cho large numbers dễ đọc</li>
+                <li><strong>Chọn đúng type:</strong> Sử dụng L cho long, f cho float</li>
+                <li><strong>Avoid magic numbers:</strong> Sử dụng constants thay vì literals</li>
+                <li><strong>String interning:</strong> Hiểu về String pool để optimize memory</li>
+            </ul>
+
+            <div class="code-block">
+                <code>// Good practice - sử dụng constants
+public class Constants {
+    public static final int MAX_RETRY_COUNT = 3;
+    public static final double TAX_RATE = 0.08;
+    public static final String DEFAULT_ENCODING = "UTF-8";
+}
+
+// Bad practice - magic numbers
+if (retryCount > 3) { // Magic number!
+    // handle error
+}
+
+// Good practice - named constants
+if (retryCount > Constants.MAX_RETRY_COUNT) {
+    // handle error
+}</code>
+            </div>
+
+            <h2>🎓 Tổng kết</h2>
+            <p>
+                Literals là building blocks cơ bản trong Java programming. Hiểu rõ về các loại literals 
+                và cách sử dụng chúng một cách hiệu quả sẽ giúp bạn viết code rõ ràng và maintainable hơn.
+            </p>
+
+            <h2>🔗 Bài viết liên quan</h2>
+            <ul>
+                <li><a href="java-objects.html">Objects trong Java</a></li>
+                <li><a href="java-properties.html">Properties trong Java</a></li>
+                <li><a href="../blog.html">Xem tất cả bài viết</a></li>
+            </ul>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevBlog. Made with ❤️ for the programming community.</p>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

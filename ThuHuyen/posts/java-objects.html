@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiểu về Objects trong Java - DevBlog</title>
+    <meta name="description" content="Tìm hiểu sâu về khái niệm Objects trong Java - nền tảng cốt lõi của lập trình hướng đối tượng (OOP).">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DevBlog</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../blog.html" class="nav-link">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Article Content -->
+    <article class="article">
+        <a href="../blog.html" class="back-btn">← Quay lại Blog</a>
+        
+        <header class="article-header">
+            <h1 class="article-title">Hiểu về Objects trong Java</h1>
+            <div class="article-meta">
+                <span class="blog-category">Java</span> • 
+                Đăng ngày 29/09/2024 • 
+                8 phút đọc
+            </div>
+        </header>
+
+        <div class="article-content">
+            <h2>📖 Giới thiệu</h2>
+            <p>
+                Objects (đối tượng) là khái niệm cốt lõi trong Java và lập trình hướng đối tượng (OOP). 
+                Mọi thứ trong Java đều là object (trừ primitive types), và hiểu rõ về objects sẽ giúp bạn 
+                làm chủ Java một cách hiệu quả.
+            </p>
+
+            <h2>🎯 Object là gì?</h2>
+            <p>
+                Trong Java, <span class="inline-code">Object</span> là một thể hiện (instance) của một class. 
+                Nó chứa:
+            </p>
+            <ul>
+                <li><strong>State (Trạng thái):</strong> Được biểu diễn bởi các attributes/fields</li>
+                <li><strong>Behavior (Hành vi):</strong> Được biểu diễn bởi các methods</li>
+                <li><strong>Identity (Định danh):</strong> Địa chỉ duy nhất trong memory</li>
+            </ul>
+
+            <h2>💡 Tạo Objects trong Java</h2>
+            <p>Có nhiều cách để tạo objects trong Java:</p>
+
+            <h3>1. Sử dụng từ khóa <span class="inline-code">new</span></h3>
+            <div class="code-block">
+                <code>// Định nghĩa class
+public class Student {
+    private String name;
+    private int age;
+    
+    // Constructor
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+    
+    // Getter methods
+    public String getName() {
+        return name;
+    }
+    
+    public int getAge() {
+        return age;
+    }
+}
+
+// Tạo objects
+public class Main {
+    public static void main(String[] args) {
+        // Tạo object sử dụng new keyword
+        Student student1 = new Student("Minh", 20);
+        Student student2 = new Student("Lan", 21);
+        
+        System.out.println(student1.getName()); // Output: Minh
+        System.out.println(student2.getAge());  // Output: 21
+    }
+}</code>
+            </div>
+
+            <h3>2. Sử dụng Factory Methods</h3>
+            <div class="code-block">
+                <code>public class Student {
+    private String name;
+    private int age;
+    
+    private Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+    
+    // Factory method
+    public static Student createStudent(String name, int age) {
+        if (age < 0 || age > 100) {
+            throw new IllegalArgumentException("Invalid age");
+        }
+        return new Student(name, age);
+    }
+    
+    // Factory method với validation
+    public static Student createAdultStudent(String name, int age) {
+        if (age < 18) {
+            throw new IllegalArgumentException("Student must be adult");
+        }
+        return new Student(name, age);
+    }
+}
+
+// Sử dụng
+Student student = Student.createStudent("Nam", 22);
+Student adultStudent = Student.createAdultStudent("Hoa", 25);</code>
+            </div>
+
+            <h2>🔍 Object Identity và Equality</h2>
+            <p>Java phân biệt giữa hai khái niệm quan trọng:</p>
+
+            <h3>Reference Equality (==)</h3>
+            <div class="code-block">
+                <code>Student s1 = new Student("Minh", 20);
+Student s2 = new Student("Minh", 20);
+Student s3 = s1;
+
+System.out.println(s1 == s2); // false - khác reference
+System.out.println(s1 == s3); // true - cùng reference</code>
+            </div>
+
+            <h3>Object Equality (.equals())</h3>
+            <div class="code-block">
+                <code>public class Student {
+    private String name;
+    private int age;
+    
+    // Constructor và getters...
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        
+        Student student = (Student) obj;
+        return age == student.age && 
+               Objects.equals(name, student.name);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
+    }
+}
+
+// Sử dụng
+Student s1 = new Student("Minh", 20);
+Student s2 = new Student("Minh", 20);
+
+System.out.println(s1.equals(s2)); // true - cùng content</code>
+            </div>
+
+            <h2>📊 Object Lifecycle</h2>
+            <p>Mỗi object trong Java trải qua các giai đoạn:</p>
+            
+            <ol>
+                <li><strong>Creation:</strong> Object được tạo bằng <span class="inline-code">new</span></li>
+                <li><strong>Usage:</strong> Object được sử dụng thông qua methods</li>
+                <li><strong>Garbage Collection:</strong> Object được giải phóng khi không còn reference</li>
+            </ol>
+
+            <div class="code-block">
+                <code>public class ObjectLifecycleDemo {
+    public static void main(String[] args) {
+        // 1. Creation
+        Student student = new Student("Minh", 20);
+        
+        // 2. Usage
+        System.out.println(student.getName());
+        
+        // 3. Removing reference
+        student = null; // Object eligible for GC
+        
+        // Force garbage collection (not recommended in production)
+        System.gc();
+    }
+}</code>
+            </div>
+
+            <h2>🎨 Best Practices khi làm việc với Objects</h2>
+
+            <h3>1. Immutable Objects</h3>
+            <div class="code-block">
+                <code>public final class ImmutableStudent {
+    private final String name;
+    private final int age;
+    
+    public ImmutableStudent(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public int getAge() {
+        return age;
+    }
+    
+    // Không có setter methods
+    
+    // Tạo object mới thay vì modify
+    public ImmutableStudent withAge(int newAge) {
+        return new ImmutableStudent(this.name, newAge);
+    }
+}</code>
+            </div>
+
+            <h3>2. Builder Pattern cho Objects phức tạp</h3>
+            <div class="code-block">
+                <code>public class StudentBuilder {
+    private String name;
+    private int age;
+    private String email;
+    private String phone;
+    
+    public StudentBuilder setName(String name) {
+        this.name = name;
+        return this;
+    }
+    
+    public StudentBuilder setAge(int age) {
+        this.age = age;
+        return this;
+    }
+    
+    public StudentBuilder setEmail(String email) {
+        this.email = email;
+        return this;
+    }
+    
+    public StudentBuilder setPhone(String phone) {
+        this.phone = phone;
+        return this;
+    }
+    
+    public Student build() {
+        return new Student(name, age, email, phone);
+    }
+}
+
+// Sử dụng
+Student student = new StudentBuilder()
+    .setName("Minh")
+    .setAge(20)
+    .setEmail("minh@example.com")
+    .setPhone("0123456789")
+    .build();</code>
+            </div>
+
+            <h2>⚡ Performance Tips</h2>
+            <ul>
+                <li><strong>Object Pooling:</strong> Tái sử dụng objects cho heavy operations</li>
+                <li><strong>Lazy Initialization:</strong> Tạo objects khi thực sự cần</li>
+                <li><strong>Avoid unnecessary object creation:</strong> Sử dụng StringBuilder thay vì String concatenation</li>
+            </ul>
+
+            <div class="code-block">
+                <code>// Bad - tạo nhiều String objects không cần thiết
+String result = "";
+for (int i = 0; i < 1000; i++) {
+    result += "Hello " + i;
+}
+
+// Good - sử dụng StringBuilder
+StringBuilder sb = new StringBuilder();
+for (int i = 0; i < 1000; i++) {
+    sb.append("Hello ").append(i);
+}
+String result = sb.toString();</code>
+            </div>
+
+            <h2>🎓 Tổng kết</h2>
+            <p>
+                Objects là nền tảng của Java programming. Hiểu rõ về cách tạo, sử dụng và quản lý objects 
+                sẽ giúp bạn viết code hiệu quả và maintainable hơn. Những điểm chính cần nhớ:
+            </p>
+            <ul>
+                <li>Objects = State + Behavior + Identity</li>
+                <li>Phân biệt reference equality và object equality</li>
+                <li>Hiểu object lifecycle và garbage collection</li>
+                <li>Áp dụng design patterns phù hợp</li>
+                <li>Optimize performance khi cần thiết</li>
+            </ul>
+
+            <h2>🔗 Bài viết liên quan</h2>
+            <ul>
+                <li><a href="java-properties.html">Properties trong Java</a></li>
+                <li><a href="java-literals.html">Literals trong Java</a></li>
+                <li><a href="../blog.html">Xem tất cả bài viết</a></li>
+            </ul>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevBlog. Made with ❤️ for the programming community.</p>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>
